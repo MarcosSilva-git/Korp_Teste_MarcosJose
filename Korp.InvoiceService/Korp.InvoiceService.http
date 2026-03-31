@@ -1,0 +1,6 @@
+@Korp.InvoiceService_HostAddress = http://localhost:5226
+
+GET {{Korp.InvoiceService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
