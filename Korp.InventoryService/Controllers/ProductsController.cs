@@ -8,7 +8,7 @@ namespace Korp.InventoryService.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : Controller
+public class ProductsController : ControllerBase
 {
     private readonly ILogger<ProductsController> _logger;
     private readonly InventoryDbContext _inventoryDbContext;
@@ -20,14 +20,44 @@ public class ProductsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> Get([FromQuery] string? ids = null)
     {
-        var products = await _inventoryDbContext
+        if (ids is null || string.IsNullOrWhiteSpace(ids))
+        {
+            var products = await _inventoryDbContext
+                .Products
+                .AsNoTracking()
+                .ToListAsync();
+
+            return Ok(products);
+        }
+
+        SortedSet<int> idSet;
+
+        try
+        {
+            idSet = [.. ids.Split(',').Select(int.Parse)];
+        }
+        catch (Exception e) when (e is FormatException || e is OverflowException)
+        {
+            _logger.LogError(e, "Failed to parse IDs from query string: {Ids}", ids);
+            return Problem(
+                title: "Invalid ID format",
+                detail: "One or more IDs could not be converted to integers.",
+                statusCode: StatusCodes.Status400BadRequest
+            );
+        }
+
+        var productsById = await _inventoryDbContext
             .Products
             .AsNoTracking()
+            .Where(p => idSet.Contains(p.Id))
             .ToListAsync();
 
-        return Ok(products);
+        return Ok(new
+        {
+            Products = productsById
+        });
     }
 
     [HttpPost]
