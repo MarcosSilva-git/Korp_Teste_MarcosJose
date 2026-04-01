@@ -1,4 +1,3 @@
-
 using Korp.InventoryService.Data;
 using Korp.Shared.Middlewares;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +16,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
@@ -34,6 +32,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();

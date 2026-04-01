@@ -2,8 +2,11 @@
 
 public class InvoiceEntity
 {
-    public int Code { get; set; }
+    public int Id { get; set; }
     public InvoiceStatusEnum InvoiceStatus { get; set; }
-    public ICollection<InvoiceItem>? InvoiceItems { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime? DeletedAt { get; set; }
 
+
+    public ICollection<InvoiceItemEntity>? InvoiceItems { get; set; }
 }
