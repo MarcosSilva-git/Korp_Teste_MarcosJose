@@ -40,16 +40,7 @@ public class ProductsController : Controller
         };
 
         _inventoryDbContext.Add(newProduct);
-
-        try
-        {
-            await _inventoryDbContext.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "An error occurred while saving the new product to the database.");
-            throw;
-        }
+        await _inventoryDbContext.SaveChangesAsync();
 
         return CreatedAtAction(nameof(Add), newProduct);
     }
@@ -80,15 +71,7 @@ public class ProductsController : Controller
         product.Name = updatedProduct.Name;
         product.Balance = updatedProduct.Balance;
 
-        try
-        {
-            await _inventoryDbContext.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "An error occurred while saving the updated product to the database.");
-            throw;
-        }
+        await _inventoryDbContext.SaveChangesAsync();
 
         return Ok(product);
     }
@@ -118,15 +101,7 @@ public class ProductsController : Controller
 
         product.DeletedAt = DateTime.UtcNow;
 
-        try
-        {
-            await _inventoryDbContext.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "An error occurred while deleting product to the database.");
-            throw;
-        }
+        await _inventoryDbContext.SaveChangesAsync();
 
         return NoContent();
     }
