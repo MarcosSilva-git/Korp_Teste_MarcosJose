@@ -1,8 +1,13 @@
 <Solution>
   <Folder Name="/backend/">
-    <Project Path="Korp.InventoryService/Korp.InventoryService.csproj" Id="af3423a8-b14c-461f-8e91-cb8d4aa2adc7" />
-    <Project Path="Korp.InvoiceService/Korp.InvoiceService.csproj" Id="b11626a1-af00-4536-b0df-473286439cf9" />
     <Project Path="Korp.Shared/Korp.Shared.csproj" Id="635f90ca-c1eb-4eb8-a3c5-4cfee07c32b2" />
+  </Folder>
+  <Folder Name="/backend/Inventory/">
+    <Project Path="Korp.InventoryService/Korp.InventoryService.csproj" Id="af3423a8-b14c-461f-8e91-cb8d4aa2adc7" />
+  </Folder>
+  <Folder Name="/backend/Invoice/">
+    <Project Path="Korp.InvoiceService.Shared/Korp.InvoiceService.Shared.csproj" Id="e8a6361b-c064-418b-9d6d-e7aeece3a2ee" />
+    <Project Path="Korp.InvoiceService/Korp.InvoiceService.csproj" Id="b11626a1-af00-4536-b0df-473286439cf9" />
   </Folder>
   <Folder Name="/frontend/" />
 </Solution>

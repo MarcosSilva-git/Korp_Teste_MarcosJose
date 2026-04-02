@@ -1,8 +1,8 @@
-﻿using Korp.InvoiceService.Entities;
+﻿using Korp.InvoiceService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Korp.InvoiceService.Data;
+namespace Korp.InvoiceService.Infraestructure.EntityConfigurations;
 
 public class InvoiceItemEntityConfiguration : IEntityTypeConfiguration<InvoiceItemEntity>
 {
@@ -14,6 +14,10 @@ public class InvoiceItemEntityConfiguration : IEntityTypeConfiguration<InvoiceIt
 
         builder.Property(x => x.Id)
             .ValueGeneratedOnAdd();
+
+        builder.Property(x => x.ProductName)
+            .IsRequired()
+            .HasMaxLength(100);
 
         builder.HasQueryFilter(p => p.DeletedAt == null);
     }

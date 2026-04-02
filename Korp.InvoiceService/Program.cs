@@ -1,4 +1,7 @@
-using Korp.InvoiceService.Data;
+using Korp.InvoiceService.Features.CreateInvoice;
+using Korp.InvoiceService.Features.GetInvoices;
+using Korp.InvoiceService.Infraestructure;
+using Korp.InvoiceService.Infraestructure.Http;
 using Korp.Shared.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +16,15 @@ builder.Services.AddDbContext<InvoiceDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddScoped<CreateInvoiceHandler>();
+builder.Services.AddScoped<GetInvoicesHandler>();
+
+builder.Services.AddHttpClient<InventoryServiceHttpClient>(http =>
+    {
+        var baseUri = builder.Configuration["InventoryService:BaseUrl"];
+        http.BaseAddress = new Uri(baseUri!);
+    });
 
 var app = builder.Build();
 

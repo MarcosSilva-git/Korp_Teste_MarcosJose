@@ -1,8 +1,9 @@
-﻿using Korp.InvoiceService.Entities;
+﻿using Korp.InvoiceService.Domain.Entities;
+using Korp.InvoiceService.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Korp.InvoiceService.Data;
+namespace Korp.InvoiceService.Infraestructure.EntityConfigurations;
 
 public class InvoiceEntityConfiguration : IEntityTypeConfiguration<InvoiceEntity>
 {

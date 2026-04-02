@@ -1,7 +1,7 @@
-﻿using Korp.InvoiceService.Entities;
+﻿using Korp.InvoiceService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Korp.InvoiceService.Data;
+namespace Korp.InvoiceService.Infraestructure;
 
 public class InvoiceDbContext : DbContext
 {
@@ -13,6 +13,6 @@ public class InvoiceDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(InvoiceDbContext).Assembly);
     }
 
-    DbSet<InvoiceEntity> Invoices { get; set; }
-    DbSet<InvoiceItemEntity> InvoiceItems { get; set; }
+    public DbSet<InvoiceEntity> Invoices { get; set; }
+    public DbSet<InvoiceItemEntity> InvoiceItems { get; set; }
 }

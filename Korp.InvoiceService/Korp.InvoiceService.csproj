@@ -13,7 +13,12 @@
   </ItemGroup>
   
   <ItemGroup>
+  	 <ProjectReference Include="..\Korp.InvoiceService.Shared\Korp.InvoiceService.Shared.csproj" />
   	 <ProjectReference Include="..\Korp.Shared\Korp.Shared.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Features\ProcessStockDebit\" />
   </ItemGroup>
 
 </Project>
