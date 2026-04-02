@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Korp.InventoryService.Shared\Korp.InventoryService.Shared.csproj" />
     <ProjectReference Include="..\Korp.Shared\Korp.Shared.csproj" />
   </ItemGroup>
 

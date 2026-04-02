@@ -3,6 +3,7 @@
     <Project Path="Korp.Shared/Korp.Shared.csproj" Id="635f90ca-c1eb-4eb8-a3c5-4cfee07c32b2" />
   </Folder>
   <Folder Name="/backend/Inventory/">
+    <Project Path="Korp.InventoryService.Shared/Korp.InventoryService.Shared.csproj" Id="3aeb9330-a59f-49b9-9f38-58774d067891" />
     <Project Path="Korp.InventoryService/Korp.InventoryService.csproj" Id="af3423a8-b14c-461f-8e91-cb8d4aa2adc7" />
   </Folder>
   <Folder Name="/backend/Invoice/">

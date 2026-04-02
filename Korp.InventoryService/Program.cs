@@ -1,4 +1,6 @@
-using Korp.InventoryService.Data;
+using Korp.InventoryService.Features.Product.AddProduct;
+using Korp.InventoryService.Features.Product.DeleteProduct;
+using Korp.InventoryService.Infraestructure;
 using Korp.Shared.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +14,9 @@ builder.Services.AddLogging();
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<AddProductHandler>();
+builder.Services.AddScoped<DeleteProductHandler>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 

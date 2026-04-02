@@ -1,7 +1,7 @@
-﻿using Korp.InventoryService.Entities;
+﻿using Korp.InventoryService.Features.Product.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Korp.InventoryService.Data;
+namespace Korp.InventoryService.Infraestructure;
 
 public class InventoryDbContext : DbContext
 {

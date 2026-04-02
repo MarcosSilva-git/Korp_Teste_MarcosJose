@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Korp.InventoryService.DTOs;
+namespace Korp.InventoryService.Shared.DTOs.AddProduct;
 
 public class AddProductRequest
 {
@@ -8,5 +8,5 @@ public class AddProductRequest
     public string Name { get; set; } = null!;
 
     [Range(1, int.MaxValue, ErrorMessage = "Balance should be greater then zero")]
-    public int Balance { get; set; } 
+    public int Balance { get; set; }
 }

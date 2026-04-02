@@ -1,4 +1,4 @@
-﻿namespace Korp.InventoryService.Entities;
+﻿namespace Korp.InventoryService.Features.Product.Domain;
 
 public class ProductEntity
 {

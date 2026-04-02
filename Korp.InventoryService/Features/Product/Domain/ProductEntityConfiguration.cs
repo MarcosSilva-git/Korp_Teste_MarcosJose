@@ -1,8 +1,7 @@
-﻿using Korp.InventoryService.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Korp.InventoryService.Infraestructure;
+namespace Korp.InventoryService.Features.Product.Domain;
 
 public class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity>
 {
