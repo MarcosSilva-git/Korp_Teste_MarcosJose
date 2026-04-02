@@ -1,4 +1,5 @@
 ﻿using Korp.InvoiceService.Shared.DTOs.CreateInvoice;
+using Korp.Shared.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Korp.InvoiceService.Features.CreateInvoice;
@@ -13,8 +14,12 @@ public class CreateInvoiceController(CreateInvoiceHandler createInvoiceHandler) 
     {
         var result = await _createInvoiceHandler.HandleAsync(request);
 
-        return result.Match<IActionResult>(
-            id => CreatedAtAction(nameof(Add), new { id }, null),
-            BadRequest);
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(Add), new { id = result.Value }, null);
+
+        return Problem(
+            title: "Failed to create invoice",
+            detail: result.Error,
+            statusCode: StatusCodes.Status400BadRequest);
     }
 }

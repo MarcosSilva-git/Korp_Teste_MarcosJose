@@ -24,19 +24,20 @@ public class CreateInvoiceHandler(
 
         var newInvoice = new InvoiceEntity(items);
 
-        await _invoiceDbContext.SaveChangesAsync();
-
-        try
-        {
-            await _inventoryServiceHttpClient.ReserveProductsAsync(newInvoice);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-
         _invoiceDbContext.Add(newInvoice);
         await _invoiceDbContext.SaveChangesAsync();
+
+        //try
+        //{
+        //    await _inventoryServiceHttpClient.ReserveProductsAsync(newInvoice);
+        //}
+        //catch (Exception)
+        //{
+        //    throw;
+        //}
+
+        //_invoiceDbContext.Add(newInvoice);
+        //await _invoiceDbContext.SaveChangesAsync();
 
         return newInvoice.Id;
     }

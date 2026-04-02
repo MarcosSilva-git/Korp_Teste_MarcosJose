@@ -11,6 +11,6 @@ public class GetInvoicesController(GetInvoicesHandler handler) : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var invoices = await _handler.HandleAsync();
-        return Ok(invoices);
+        return Ok(new { invoices });
     }
 }
