@@ -41,7 +41,7 @@ public class GetInvoicesHandler(InvoiceDbContext invoiceDbContext, ILogger<GetIn
                .Select(invoice => new GetInvoiceResponse()
                {
                    Id = invoice.Id,
-                   InvoiceStatus = invoice.InvoiceStatus.ToString(),
+                   Status = invoice.InvoiceStatus.ToString(),
                    CreatedAt = invoice.CreatedAt,
                    items = invoice.InvoiceItems.Select(ii => new GetInvoiceItemResponse
                    {

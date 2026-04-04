@@ -38,7 +38,7 @@ public class CreateInvoiceHandler(
         {
             Id = invoice.Id,
             CreatedAt = invoice.CreatedAt,
-            InvoiceStatus = invoice.InvoiceStatus.ToString(),
+            Status = invoice.InvoiceStatus.ToString(),
             items = invoice.InvoiceItems.Select(i => new GetInvoiceItemResponse()
             {
                 Id = i.Id,
