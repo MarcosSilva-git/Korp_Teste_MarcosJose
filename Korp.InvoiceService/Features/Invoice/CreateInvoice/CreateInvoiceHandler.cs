@@ -4,13 +4,14 @@ using Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Shared.DTOs.CreateInvoice;
 using Korp.InvoiceService.Shared.DTOs.GetInvoices;
+using Korp.Shared.Interfaces;
 
 namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 public class CreateInvoiceHandler(
     InvoiceDbContext invoiceDbContext,
     ProcessStockDebitHandler processStockDebitHandler,
-    IBackgroundJobClient backgroundJobClient)
+    IBackgroundJobClient backgroundJobClient) : IRequestHandlerAsync<CreateInvoiceRequest, GetInvoiceResponse>
 {
     private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
     private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;

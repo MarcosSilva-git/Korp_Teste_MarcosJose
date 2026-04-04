@@ -6,7 +6,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InvoiceService.Features.Invoice.GetInvoices;
 
-public class GetInvoicesHandler(InvoiceDbContext invoiceDbContext, ILogger<GetInvoicesHandler> logger)
+public class GetInvoicesHandler(
+    InvoiceDbContext invoiceDbContext, 
+    ILogger<GetInvoicesHandler> logger)
 {
     private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
     private readonly ILogger<GetInvoicesHandler> _logger = logger;
