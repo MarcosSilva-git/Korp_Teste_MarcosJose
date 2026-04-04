@@ -1,5 +1,8 @@
+using Hangfire;
+using Hangfire.Storage.SQLite;
 using Korp.InvoiceService.Features.Invoice.CreateInvoice;
 using Korp.InvoiceService.Features.Invoice.GetInvoices;
+using Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Infraestructure.Http;
 using Korp.Shared.Middlewares;
@@ -19,6 +22,18 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddScoped<CreateInvoiceHandler>();
 builder.Services.AddScoped<GetInvoicesHandler>();
+builder.Services.AddScoped<ProcessStockDebitHandler>();
+builder.Services.AddScoped<RollbackProcessStockDebitHandler>();
+
+GlobalConfiguration.Configuration
+    .UseSQLiteStorage("InvoiceServiceDb.db");
+
+builder.Services.AddHangfire(configuration => configuration
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSQLiteStorage("InvoiceServiceDb.db"));
+
+builder.Services.AddHangfireServer();
 
 builder.Services.AddHttpClient<InventoryServiceHttpClient>(http =>
     {
@@ -34,6 +49,7 @@ if (app.Environment.IsDevelopment())
     var database = scope.ServiceProvider.GetRequiredService<InvoiceDbContext>();
     database.Database.Migrate();
 
+    app.UseHangfireDashboard();
     app.MapOpenApi();
 }
 

@@ -11,7 +11,7 @@ public class GetInvoicesHandler(InvoiceDbContext invoiceDbContext, ILogger<GetIn
     private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
     private readonly ILogger<GetInvoicesHandler> _logger = logger;
 
-    public async Task<Result<List<GetInvoiceResponse>, ValidationResult>> HandleAsync(string ids, CancellationToken cancellationToken = default)
+    public async Task<Result<List<GetInvoiceResponse>, ValidationResult>> HandleAsync(string? ids, CancellationToken cancellationToken = default)
     {
         if (ids is null || string.IsNullOrWhiteSpace(ids))
             return await GetInvoicesAsync(ids: null, cancellationToken);
@@ -32,11 +32,10 @@ public class GetInvoicesHandler(InvoiceDbContext invoiceDbContext, ILogger<GetIn
     private async Task<List<GetInvoiceResponse>> GetInvoicesAsync(SortedSet<int>? ids, CancellationToken cancellationToken)
     {
         var query = _invoiceDbContext.Invoices
-               .Include(i => i.InvoiceItems)
                .AsNoTracking();
 
         if (ids != null)
-            query.Where(p => ids.Contains(p.Id));
+            query = query.Where(p => ids.Contains(p.Id));
 
         return await query
                .Select(invoice => new GetInvoiceResponse()

@@ -8,7 +8,7 @@ public class GetInvoicesController(GetInvoicesHandler handler) : ControllerBase
     private readonly GetInvoicesHandler _handler = handler;
 
     [HttpGet("api/invoices")]
-    public async Task<IActionResult> Get([FromQuery] string ids)
+    public async Task<IActionResult> Get([FromQuery] string? ids)
     {
         var result = await _handler.HandleAsync(ids);
 
@@ -19,8 +19,6 @@ public class GetInvoicesController(GetInvoicesHandler handler) : ControllerBase
 
             return ValidationProblem(ModelState);
         }
-
-
 
         return Ok(new { Invoices = result.Value });
     }

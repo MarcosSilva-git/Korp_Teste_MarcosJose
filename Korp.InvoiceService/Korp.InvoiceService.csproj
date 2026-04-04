@@ -7,6 +7,8 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.8.23" />
+    <PackageReference Include="Hangfire.Storage.SQLite" Version="0.4.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5" />
@@ -16,10 +18,6 @@
   	 <ProjectReference Include="..\Korp.InventoryService.Shared\Korp.InventoryService.Shared.csproj" />
   	 <ProjectReference Include="..\Korp.InvoiceService.Shared\Korp.InvoiceService.Shared.csproj" />
   	 <ProjectReference Include="..\Korp.Shared\Korp.Shared.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Features\Invoice\ProcessStockDebit\" />
   </ItemGroup>
 
 </Project>

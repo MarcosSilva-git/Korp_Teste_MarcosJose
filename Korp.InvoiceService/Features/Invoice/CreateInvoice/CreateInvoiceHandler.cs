@@ -1,43 +1,54 @@
-﻿using Korp.InvoiceService.Domain.Entities;
+﻿using Hangfire;
+using Korp.InvoiceService.Domain.Entities;
+using Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Infraestructure.Http;
+using Korp.InvoiceService.Migrations;
 using Korp.InvoiceService.Shared.DTOs.CreateInvoice;
+using Korp.InvoiceService.Shared.DTOs.GetInvoices;
 using Korp.Shared.Abstractions;
 
 namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 public class CreateInvoiceHandler(
     InvoiceDbContext invoiceDbContext,
-    InventoryServiceHttpClient inventoryServiceHttpClient)
+    InventoryServiceHttpClient inventoryServiceHttpClient,
+    ProcessStockDebitHandler processStockDebitHandler,
+    IBackgroundJobClient backgroundJobClient)
 {
     private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
     private readonly InventoryServiceHttpClient _inventoryServiceHttpClient = inventoryServiceHttpClient;
+    private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
+    private readonly ProcessStockDebitHandler _processStockDebitHandler = processStockDebitHandler;
 
-    public async Task<Result<int, string>> HandleAsync(CreateInvoiceRequest request)
+    public async Task<GetInvoiceResponse> HandleAsync(CreateInvoiceRequest request)
     {
         var invoice = await AddPendingInvoice(request);
 
         try
         {
-            var result = await _inventoryServiceHttpClient.ReserveProductsAsync(invoice);
-
-            if (result.IsSuccess)
-            {
-                invoice.MarkAsOpen();
-                await _invoiceDbContext.SaveChangesAsync();
-                
-                return invoice.Id;
-            }
-
-            // If reservation fails, we can choose to either keep the invoice as pending or delete it.
+            await _processStockDebitHandler.HandleAsync(invoice.SagaId, null);
         }
         catch (Exception)
         {
-            throw;
+            _backgroundJobClient.Enqueue<ProcessStockDebitHandler>(x => x.HandleAsync(invoice.SagaId, null));
         }
 
-
-        //return invoice.Id;
+        return new GetInvoiceResponse()
+        {
+            Id = invoice.Id,
+            CreatedAt = invoice.CreatedAt,
+            InvoiceStatus = invoice.InvoiceStatus.ToString(),
+            items = invoice.InvoiceItems.Select(i => new GetInvoiceItemResponse()
+            {
+                Id = i.Id,
+                Quantity = i.Quantity,
+                ProductId = i.ProductId,
+                CreatedDate = i.CreatedAt,
+                ProductName = i.ProductName,
+                ItemSequence = i.ItemSequence,
+            }),
+        };
     }
 
     public async Task<InvoiceEntity> AddPendingInvoice(CreateInvoiceRequest request)
