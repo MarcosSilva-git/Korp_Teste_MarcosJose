@@ -1,4 +1,4 @@
-﻿using Korp.InvoiceService.Domain.Entities;
+﻿using Korp.InvoiceService.Features.Invoice.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korp.InvoiceService.Infraestructure;

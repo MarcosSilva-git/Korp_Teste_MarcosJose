@@ -1,8 +1,8 @@
-﻿using Korp.InvoiceService.Domain.Enums;
+﻿using Korp.InvoiceService.Features.Invoice.Domain.Enums;
 
-namespace Korp.InvoiceService.Domain.Exceptions;
+namespace Korp.InvoiceService.Features.Invoice.Domain.Exceptions;
 
-public class InvalidInvoiceStateException : BusinessException
+public class InvalidInvoiceStateException : Exception
 {
     public InvoiceStatusEnum CurrentStatus { get; }
 

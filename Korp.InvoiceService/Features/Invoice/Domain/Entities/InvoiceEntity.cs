@@ -1,7 +1,7 @@
-﻿using Korp.InvoiceService.Domain.Enums;
-using Korp.InvoiceService.Domain.Exceptions;
+﻿using Korp.InvoiceService.Features.Invoice.Domain.Enums;
+using Korp.InvoiceService.Features.Invoice.Domain.Exceptions;
 
-namespace Korp.InvoiceService.Domain.Entities;
+namespace Korp.InvoiceService.Features.Invoice.Domain.Entities;
 
 public class InvoiceEntity
 {

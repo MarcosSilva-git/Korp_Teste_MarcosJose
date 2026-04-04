@@ -1,5 +1,5 @@
 ﻿using Korp.InventoryService.Shared.DTOs.ReserveProducts;
-using Korp.InvoiceService.Domain.Entities;
+using Korp.InvoiceService.Features.Invoice.Domain.Entities;
 using Korp.Shared.Abstractions;
 using System.Net;
 using System.Text;

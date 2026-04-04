@@ -1,23 +1,18 @@
 ﻿using Hangfire;
-using Korp.InvoiceService.Domain.Entities;
+using Korp.InvoiceService.Features.Invoice.Domain.Entities;
 using Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 using Korp.InvoiceService.Infraestructure;
-using Korp.InvoiceService.Infraestructure.Http;
-using Korp.InvoiceService.Migrations;
 using Korp.InvoiceService.Shared.DTOs.CreateInvoice;
 using Korp.InvoiceService.Shared.DTOs.GetInvoices;
-using Korp.Shared.Abstractions;
 
 namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 public class CreateInvoiceHandler(
     InvoiceDbContext invoiceDbContext,
-    InventoryServiceHttpClient inventoryServiceHttpClient,
     ProcessStockDebitHandler processStockDebitHandler,
     IBackgroundJobClient backgroundJobClient)
 {
     private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
-    private readonly InventoryServiceHttpClient _inventoryServiceHttpClient = inventoryServiceHttpClient;
     private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
     private readonly ProcessStockDebitHandler _processStockDebitHandler = processStockDebitHandler;
 

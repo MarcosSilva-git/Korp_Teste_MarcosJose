@@ -1,6 +1,6 @@
-﻿using Korp.InvoiceService.Domain.Exceptions;
+﻿using Korp.InvoiceService.Features.Invoice.Domain.Exceptions;
 
-namespace Korp.InvoiceService.Domain.Entities;
+namespace Korp.InvoiceService.Features.Invoice.Domain.Entities;
 
 public class InvoiceItemEntity
 {
@@ -31,7 +31,7 @@ public class InvoiceItemEntity
     public void UpdateQuantity(int quantity)
     {
         if (quantity <= 0)
-            throw new BusinessException("Invoice quantity must be greater than zero");
+            throw new ArgumentException("Invoice quantity must be greater than zero");
 
         Quantity = quantity;
     }

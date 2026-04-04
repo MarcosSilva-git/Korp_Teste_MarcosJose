@@ -1,6 +1,6 @@
 ﻿using Hangfire;
 using Hangfire.Server;
-using Korp.InvoiceService.Domain.Enums;
+using Korp.InvoiceService.Features.Invoice.Domain.Enums;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Infraestructure.Http;
 using Korp.Shared.Attributes;

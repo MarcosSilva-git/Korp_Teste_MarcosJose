@@ -1,4 +1,4 @@
-﻿namespace Korp.InvoiceService.Domain.Enums;
+﻿namespace Korp.InvoiceService.Features.Invoice.Domain.Enums;
 
 public enum InvoiceStatusEnum
 {
