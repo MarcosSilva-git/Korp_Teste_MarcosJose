@@ -1,4 +1,5 @@
 ﻿using Korp.InventoryService.Infraestructure;
+using Korp.InventoryService.Shared.DTOs.ReserveProducts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korp.InventoryService.Features.Product.ReserveProducts;
@@ -7,10 +8,10 @@ public class RollbackReserveProductsHandler(InventoryDbContext inventoryDbContex
 {
     private readonly InventoryDbContext _inventoryDbContext = inventoryDbContext;
 
-    public async Task HandleAsync(Guid sagaId)
+    public async Task HandleAsync(RollbackReserveProductsRequest request)
     {
         var reservations = await _inventoryDbContext.ReservedProducts
-            .Where(r => r.SagaId == sagaId && r.RolledbackAt == null)
+            .Where(r => r.SagaId == request.SagaId && r.RolledbackAt == null)
             .ToListAsync();
 
         if (reservations.Any())

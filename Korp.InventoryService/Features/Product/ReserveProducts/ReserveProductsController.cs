@@ -1,5 +1,4 @@
 ﻿using Korp.InventoryService.Shared.DTOs.ReserveProducts;
-using Korp.Shared.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Korp.InventoryService.Features.Product.ReserveProducts;
@@ -29,10 +28,10 @@ public class ReserveProductsController(ReserveProductsHandler reserveProductsHan
         return NoContent();
     }
 
-    [HttpDelete("api/products/reserve/rollback/{sagaId}")]
-    public async Task<IActionResult> RollbackReserveProducts([NotEmptyGuid] Guid sagaId)
+    [HttpPost("api/products/reserve/rollback")]
+    public async Task<IActionResult> RollbackReserveProducts(RollbackReserveProductsRequest request)
     {
-        await _rollbackReserveProductsHandler.HandleAsync(sagaId);
+        await _rollbackReserveProductsHandler.HandleAsync(request);
         return NoContent();
     }
 }

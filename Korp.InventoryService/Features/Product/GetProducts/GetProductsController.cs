@@ -8,17 +8,16 @@ public class GetProductsController(GetProductsHandler getProductsHandler) : Cont
     private readonly GetProductsHandler _getProductsHandler = getProductsHandler;
 
     [HttpGet("api/products")]
-    public async Task<IActionResult> Get([FromQuery] string? ids = null)
+    public async Task<IActionResult> Get([FromQuery] string? ids, CancellationToken cancellationToken)
     {
-        var result = await _getProductsHandler.HandlerAsync(ids);
+        var result = await _getProductsHandler.HandlerAsync(ids, cancellationToken);
 
-        if (result.IsFailure && result.Error is FormatException)
+        if (result.IsFailure)
         {
-            return Problem(
-                statusCode: StatusCodes.Status400BadRequest,
-                title: "Invalid format for product IDs",
-                detail: result.Error.Message
-            );
+            var memberName = result.Error!.MemberNames.FirstOrDefault() ?? string.Empty;
+            ModelState.AddModelError(memberName, result.Error.ErrorMessage ?? string.Empty);
+
+            return ValidationProblem(ModelState);
         }
 
         return Ok(new { Products = result.Value });

@@ -2,6 +2,7 @@
 using Korp.InventoryService.Shared.DTOs.GetProducts;
 using Korp.Shared.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InventoryService.Features.Product.GetProducts;
 
@@ -10,7 +11,7 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
     private readonly InventoryDbContext _inventoryDbContext = inventoryDbContext;
     private readonly ILogger<GetProductsHandler> _logger = logger;
 
-    public async Task<Result<IEnumerable<GetProductsResponse>, FormatException>> HandlerAsync(string? ids = null)
+    public async Task<Result<IEnumerable<GetProductsResponse>, ValidationResult>> HandlerAsync(string? ids, CancellationToken cancellationToken)
     {
         if (ids is null || string.IsNullOrWhiteSpace(ids))
         {
@@ -26,7 +27,7 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
                     Available = p.Available,
                     CreatedAt = p.CreatedAt,
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         SortedSet<int> idSet;
@@ -38,7 +39,7 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
         catch (FormatException e)
         {
             _logger.LogWarning(e, "Failed to parse IDs from query string: {Ids}", ids);
-            return new FormatException("One or more IDs could not be converted to integers.");
+            return new ValidationResult("One or more IDs could not be converted to integers.", [nameof(ids)]);
         }
 
         return await _inventoryDbContext
@@ -54,6 +55,6 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
                 Available = p.Available,
                 CreatedAt = p.CreatedAt,
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }

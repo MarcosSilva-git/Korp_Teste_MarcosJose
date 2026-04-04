@@ -1,5 +1,5 @@
-using Korp.InvoiceService.Features.CreateInvoice;
-using Korp.InvoiceService.Features.GetInvoices;
+using Korp.InvoiceService.Features.Invoice.CreateInvoice;
+using Korp.InvoiceService.Features.Invoice.GetInvoices;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Infraestructure.Http;
 using Korp.Shared.Middlewares;

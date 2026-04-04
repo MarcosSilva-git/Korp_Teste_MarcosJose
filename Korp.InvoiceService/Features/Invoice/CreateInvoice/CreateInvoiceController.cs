@@ -2,7 +2,7 @@
 using Korp.Shared.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Korp.InvoiceService.Features.CreateInvoice;
+namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 [ApiController]
 public class CreateInvoiceController(CreateInvoiceHandler createInvoiceHandler) : ControllerBase

@@ -4,7 +4,7 @@ using Korp.InvoiceService.Infraestructure.Http;
 using Korp.InvoiceService.Shared.DTOs.CreateInvoice;
 using Korp.Shared.Abstractions;
 
-namespace Korp.InvoiceService.Features.CreateInvoice;
+namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 public class CreateInvoiceHandler(
     InvoiceDbContext invoiceDbContext,
@@ -15,9 +15,33 @@ public class CreateInvoiceHandler(
 
     public async Task<Result<int, string>> HandleAsync(CreateInvoiceRequest request)
     {
-        if (request.InvoiceItems.Count == 0)
-            return "Invoice must contain at least one item.";
+        var invoice = await AddPendingInvoice(request);
 
+        try
+        {
+            var result = await _inventoryServiceHttpClient.ReserveProductsAsync(invoice);
+
+            if (result.IsSuccess)
+            {
+                invoice.MarkAsOpen();
+                await _invoiceDbContext.SaveChangesAsync();
+                
+                return invoice.Id;
+            }
+
+            // If reservation fails, we can choose to either keep the invoice as pending or delete it.
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
+
+        //return invoice.Id;
+    }
+
+    public async Task<InvoiceEntity> AddPendingInvoice(CreateInvoiceRequest request)
+    {
         var items = request.InvoiceItems
             .Select((i, count) => new InvoiceItemEntity(i.ProductId, i.ProductName, i.Quantity, count + 1))
             .ToList();
@@ -27,18 +51,6 @@ public class CreateInvoiceHandler(
         _invoiceDbContext.Add(newInvoice);
         await _invoiceDbContext.SaveChangesAsync();
 
-        //try
-        //{
-        //    await _inventoryServiceHttpClient.ReserveProductsAsync(newInvoice);
-        //}
-        //catch (Exception)
-        //{
-        //    throw;
-        //}
-
-        //_invoiceDbContext.Add(newInvoice);
-        //await _invoiceDbContext.SaveChangesAsync();
-
-        return newInvoice.Id;
+        return newInvoice;
     }
 }
