@@ -16,8 +16,8 @@ public class UpdateProductHandler(InventoryDbContext inventoryDbContext)
         if (product is null)
             return new KeyNotFoundException($"Product with id {productId} was not found.");
 
-        product.Name = request.Name;
-        product.Balance = request.Balance;
+        product.ChangeName(request.Name);
+        product.AddStock(request.Stock - product.Stock);
 
         await _inventoryDbContext.SaveChangesAsync();
 
@@ -25,7 +25,7 @@ public class UpdateProductHandler(InventoryDbContext inventoryDbContext)
         {
             Id = product.Id,
             Name = product.Name,
-            Balance = product.Balance,
+            Balance = product.Stock,
             CreatedAt = product.CreatedAt
         };
     }

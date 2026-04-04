@@ -23,9 +23,7 @@ public class UpdateProductController(UpdateProductHandler updateProductHandler) 
         }
 
         if (result.IsFailure)
-        {
             throw new InvalidOperationException("Unhandled result exception", result.Error);
-        }
 
         return Ok(result.Value);
     }

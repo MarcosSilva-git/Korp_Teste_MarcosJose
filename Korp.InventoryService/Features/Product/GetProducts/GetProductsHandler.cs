@@ -21,7 +21,7 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    Balance = p.Balance,
+                    Balance = p.Stock,
                     CreatedAt = p.CreatedAt,
                 })
                 .ToListAsync();
@@ -47,7 +47,7 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
             {
                 Id = p.Id,
                 Name = p.Name,
-                Balance = p.Balance,
+                Balance = p.Stock,
                 CreatedAt = p.CreatedAt,
             })
             .ToListAsync();

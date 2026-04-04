@@ -23,9 +23,7 @@ public class DeleteProductController(DeleteProductHandler deleteProductHandler) 
         }
 
         if (result.IsFailure)
-        {
             throw new InvalidOperationException("Unhandled result exception", result.Error);
-        }
 
         return NoContent();
     }

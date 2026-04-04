@@ -8,5 +8,5 @@ public class UpdateProductRequest
     public string Name { get; set; } = null!;
     
     [Range(1, int.MaxValue, ErrorMessage = "Balance should be greater then zero")]
-    public int Balance { get; set; }
+    public int Stock { get; set; }
 }

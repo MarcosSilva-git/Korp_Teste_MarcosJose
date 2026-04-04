@@ -11,11 +11,7 @@ public class AddProductHandler(InventoryDbContext inventoryDbContext)
 
     public async Task<GetProductsResponse> HandleAsync(AddProductRequest request)
     {
-        var newProduct = new ProductEntity
-        {
-            Name = request.Name,
-            Balance = request.Balance
-        };
+        var newProduct = new ProductEntity(request.Name, request.Stock);
 
         _inventoryDbContext.Add(newProduct);
         await _inventoryDbContext.SaveChangesAsync();
@@ -24,7 +20,7 @@ public class AddProductHandler(InventoryDbContext inventoryDbContext)
         {
             Id = newProduct.Id,
             Name = newProduct.Name,
-            Balance = newProduct.Balance,
+            Balance = newProduct.Stock,
             CreatedAt = newProduct.CreatedAt
         };
     }

@@ -1,4 +1,5 @@
 using Korp.InventoryService.Features.Product.AddProduct;
+using Korp.InventoryService.Features.Product.ReserveProducts;
 using Korp.InventoryService.Features.Product.DeleteProduct;
 using Korp.InventoryService.Infraestructure;
 using Korp.Shared.Middlewares;
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
 
 builder.Services.AddScoped<AddProductHandler>();
 builder.Services.AddScoped<DeleteProductHandler>();
+builder.Services.AddScoped<ReserveProductsHandler>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 

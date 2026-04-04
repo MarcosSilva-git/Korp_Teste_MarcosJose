@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Korp.InventoryService.Features.Product.Domain;
+namespace Korp.InventoryService.Features.Product.Domain.EntityConfigurations;
 
 public class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity>
 {
@@ -18,8 +18,10 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity
                .IsRequired()
                .HasMaxLength(100);
 
-        builder.Property(p => p.Balance)
-               .IsRequired();
+        builder.Property(p => p.Stock);
+
+        builder.Property(p => p.Version)
+            .IsConcurrencyToken();
 
         builder.HasQueryFilter(p => p.DeletedAt == null);
     }
