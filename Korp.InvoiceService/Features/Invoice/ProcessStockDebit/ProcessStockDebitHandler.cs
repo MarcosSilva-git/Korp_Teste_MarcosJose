@@ -12,16 +12,18 @@ public class ProcessStockDebitHandler(
     InventoryServiceHttpClient inventoryServiceHttpClient, 
     InvoiceDbContext invoiceDbContext,
     ILogger<ProcessStockDebitHandler> logger,
-    RollbackProcessStockDebitHandler rollbackHandler)
+    RollbackProcessStockDebitHandler rollbackHandler,
+    IBackgroundJobClient backgroundJobClient)
 {
     private readonly InventoryServiceHttpClient _inventoryServiceHttpClient = inventoryServiceHttpClient;
     private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
     private readonly ILogger<ProcessStockDebitHandler> _logger = logger;
     private readonly RollbackProcessStockDebitHandler _rollbackHandler = rollbackHandler;
+    private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
     private const int MaxRetryAttempts = 1;
 
-    [AutomaticRetry(Attempts = MaxRetryAttempts, OnAttemptsExceeded = AttemptsExceededAction.Delete, DelaysInSeconds = new[] { 10, 20 })]
+    [AutomaticRetry(Attempts = MaxRetryAttempts, OnAttemptsExceeded = AttemptsExceededAction.Fail, DelaysInSeconds = new[] { 10 })]
     public async Task HandleAsync([NotEmptyGuid] Guid sagaId, PerformContext? context)
     {
         var invoice = await _invoiceDbContext.Invoices
@@ -47,21 +49,20 @@ public class ProcessStockDebitHandler(
                 return;
             }
 
-            throw new Exception($"Reserva falhou para a Invoice {invoice.Id}: {result.Error}");
+            throw new Exception($"Reserve failed to Invoice {invoice.Id}: {result.Error}");
         }
         catch (Exception e)
         {
-            int currentRetry = context?.GetJobParameter<int>("RetryCount") ?? 0;
+            int? currentRetry = context?.GetJobParameter<int>("RetryCount");
 
-            _logger.LogCritical(e, "Catastrophic error processing SagaId: {SagaId}", sagaId);
+            _logger.LogError("Number of trys: {currentRetry}", currentRetry is null ? 1 : currentRetry + 2);
+
+            currentRetry ??= 0;
 
             if (currentRetry >= MaxRetryAttempts)
             {
-                _logger.LogError("Esgotadas as tentativas do Hangfire para Saga {Id}. Cancelando.", sagaId);
-                invoice.MarkAsCancelled();
-                await _invoiceDbContext.SaveChangesAsync();
-
-                using var _ = _rollbackHandler.HandleAsync(sagaId);
+                _logger.LogError(e, "All attempts to process stock to invoce id {invoice} and saga id {saga} failed. Initialiazing cancelatioin process.", invoice.Id, sagaId);
+                _backgroundJobClient.Enqueue<ProcessStockDebitHandler>(x => x.HandleAsync(invoice.SagaId, null));
             }
             
             throw;
