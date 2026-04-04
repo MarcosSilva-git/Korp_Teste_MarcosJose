@@ -12,6 +12,7 @@ public class ReservedProductEntity : EntityBase
     public int Quantity { get; private set; }
 
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTime? RolledbackAt { get; set; }
     public DateTime? DeletedAt { get; set; }
 
     public ReservedProductEntity(int productId, Guid sagaId, int quantity, string originId, string originType)

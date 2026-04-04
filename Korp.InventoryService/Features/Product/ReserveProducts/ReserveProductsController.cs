@@ -1,13 +1,14 @@
-﻿using Korp.InventoryService.Features.Product.ReserveProducts;
-using Korp.InventoryService.Shared.DTOs.ReserveProducts;
+﻿using Korp.InventoryService.Shared.DTOs.ReserveProducts;
+using Korp.Shared.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Korp.InventoryService.Features.Product.ReserveProducts;
 
 [ApiController]
-public class ReserveProductsController(ReserveProductsHandler reserveProductsHandler) : ControllerBase
+public class ReserveProductsController(ReserveProductsHandler reserveProductsHandler, RollbackReserveProductsHandler rollbackReserveProductsHandler) : ControllerBase
 {
     private readonly ReserveProductsHandler _reserveProductsHandler = reserveProductsHandler;
+    private readonly RollbackReserveProductsHandler _rollbackReserveProductsHandler = rollbackReserveProductsHandler;
 
     [HttpPost("api/products/reserve")]
     public async Task<IActionResult> ReserveProducts([FromBody] ReserveProductsRequest request)
@@ -25,6 +26,13 @@ public class ReserveProductsController(ReserveProductsHandler reserveProductsHan
             return ValidationProblem(ModelState);
         }
 
-        return Ok();
+        return NoContent();
+    }
+
+    [HttpDelete("api/products/reserve/rollback/{sagaId}")]
+    public async Task<IActionResult> RollbackReserveProducts([NotEmptyGuid] Guid sagaId)
+    {
+        await _rollbackReserveProductsHandler.HandleAsync(sagaId);
+        return NoContent();
     }
 }

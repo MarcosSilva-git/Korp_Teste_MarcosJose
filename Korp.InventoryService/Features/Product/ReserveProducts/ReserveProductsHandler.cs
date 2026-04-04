@@ -14,12 +14,14 @@ public class ReserveProductsHandler(InventoryDbContext inventoryDbContext, ILogg
 
     public async Task<Result<bool, List<ValidationResult>>> HandleAsync(ReserveProductsRequest request)
     {
-        var ids = new int[request.Products.Count];
+        var ids = new List<int>(request.Products.Count);
 
         foreach (var item in request.Products)
-            ids.Append(item.Id);
+            ids.Add(item.Id);
 
         var products = await GetProductsAsync(ids);
+
+        await Task.Delay(2_000);
 
         var validationErrors = ValidateIdsExistence(ids, products);
         if (validationErrors.Any()) 
@@ -29,11 +31,12 @@ public class ReserveProductsHandler(InventoryDbContext inventoryDbContext, ILogg
         if (stockErrors.Any()) 
             return stockErrors;
 
-        await UpsertReservedProductsAsync(request, products);
+        var reservationWasMade = await ReserveProductsAsync(request, products);
 
         try
         {
-            await _inventoryDbContext.SaveChangesAsync();
+            if (reservationWasMade)
+                await _inventoryDbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException e)
         {
@@ -44,15 +47,14 @@ public class ReserveProductsHandler(InventoryDbContext inventoryDbContext, ILogg
         return true;
     }
 
-    private async Task<List<ProductEntity>> GetProductsAsync(int[] ids)
+    private async Task<List<ProductEntity>> GetProductsAsync(List<int> ids)
     {
         return await _inventoryDbContext.Products
             .Where(p => ids.Contains(p.Id))
-            .AsNoTracking()
             .ToListAsync();
     }
 
-    private List<ValidationResult> ValidateIdsExistence(int[] requestedIds, List<ProductEntity> products)
+    private List<ValidationResult> ValidateIdsExistence(List<int> requestedIds, List<ProductEntity> products)
     {
         var foundIds = products.Select(p => p.Id);
         var missingIds = requestedIds.Except(foundIds).ToList();
@@ -80,33 +82,33 @@ public class ReserveProductsHandler(InventoryDbContext inventoryDbContext, ILogg
         return errors;
     }
 
-    private async Task UpsertReservedProductsAsync(ReserveProductsRequest request, List<ProductEntity> products)
+    /// <returns>A boolean value indicating whether a reservation has been made or not.</returns>
+    private async Task<bool> ReserveProductsAsync(ReserveProductsRequest request, List<ProductEntity> products)
     {
         var existingReservations = await _inventoryDbContext.ReservedProducts
             .Where(ap => ap.SagaId == request.Sagaid)
-            .ToListAsync();
+            .FirstOrDefaultAsync();
+
+        if (existingReservations is not null)
+        {
+            _logger.LogWarning("Existing reservation found for Saga ID {SagaId}. Skipping reservation.", request.Sagaid);
+            return false;
+        }
 
         foreach (var reqItem in request.Products)
         {
-            var reservation = existingReservations.Find(r => r.ProductId == reqItem.Id);
             var product = products.First(p => p.Id == reqItem.Id);
 
-            if (reservation is null)
-            {
-                _inventoryDbContext.ReservedProducts.Add(new ReservedProductEntity(
-                    reqItem.Id,
-                    request.Sagaid,
-                    reqItem.Quantity,
-                    request.OriginId,
-                    request.OriginType));
+            _inventoryDbContext.ReservedProducts.Add(new ReservedProductEntity(
+                reqItem.Id,
+                request.Sagaid,
+                reqItem.Quantity,
+                request.OriginId,
+                request.OriginType));
 
-                product.AddReservation(reqItem.Quantity);
-            }
-            else
-            {
-                reservation.UpdateQuantity(reqItem.Quantity + reservation.Quantity);
-                product.RemoveReservation(reqItem.Quantity);
-            }
+            product.AddReservation(reqItem.Quantity);
         }
+
+        return true;
     }
 }

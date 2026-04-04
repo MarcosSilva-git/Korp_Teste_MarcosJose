@@ -7,7 +7,7 @@ public class GetProductsController(GetProductsHandler getProductsHandler) : Cont
 {
     private readonly GetProductsHandler _getProductsHandler = getProductsHandler;
 
-    [HttpGet]
+    [HttpGet("api/products")]
     public async Task<IActionResult> Get([FromQuery] string? ids = null)
     {
         var result = await _getProductsHandler.HandlerAsync(ids);

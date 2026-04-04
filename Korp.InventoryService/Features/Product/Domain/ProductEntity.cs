@@ -18,34 +18,26 @@ public class ProductEntity : EntityBase
     public ProductEntity(string name, int quantity)
     {
         ChangeName(name);
-        AddStock(quantity);
+        UpdateStock(quantity);
     }
 
     public void ChangeName(string name)
     {
-        if (name.Length == 0)
+        if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name cannot be empty.", nameof(name));
 
         Name = name;
     }
 
-    public void AddStock(int quantity)
+    public void UpdateStock(int newStock)
     {
-        if (quantity < 0)
-            throw new ArgumentException("Quantity must be greater then zero.", nameof(quantity));
+        if (newStock < 0)
+            throw new ArgumentException("Stock cannot be negative.", nameof(newStock));
 
-        Stock += quantity;
-    }
+        if (newStock < Stock && Available < newStock)
+            throw new InvalidOperationException($"New stock cannot be less than available quantity. Available: {Available}, New Stock: {newStock}.");
 
-    public void RemoveStock(int quantity)
-    {
-        if (quantity <= 0)
-            throw new ArgumentException("Quantity must be greater then zero.", nameof(quantity));
-
-        if (Available < quantity)
-            throw new InvalidOperationException($"Insufficient stock to remove. Available: {Available}, Requested: {quantity}.");
-
-        Stock -= quantity;
+        Stock = newStock;
     }
 
     public void AddReservation(int quantity)

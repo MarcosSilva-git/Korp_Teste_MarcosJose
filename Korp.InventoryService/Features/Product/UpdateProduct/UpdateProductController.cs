@@ -13,17 +13,13 @@ public class UpdateProductController(UpdateProductHandler updateProductHandler) 
     {
         var result = await _updateProductHandler.HandlerAsync(id, updatedProduct);
 
-        if (result.IsFailure && result.Error is KeyNotFoundException)
-        {
-            return Problem(
-                    title: "Product not found",
-                    detail: result.Error.Message,
-                    statusCode: StatusCodes.Status404NotFound
-                );
-        }
-
         if (result.IsFailure)
-            throw new InvalidOperationException("Unhandled result exception", result.Error);
+        {
+            var memberName = result.Error!.MemberNames.FirstOrDefault() ?? string.Empty;
+            ModelState.AddModelError(memberName, result.Error!.ErrorMessage ?? string.Empty);
+
+            return ValidationProblem(ModelState);
+        }
 
         return Ok(result.Value);
     }

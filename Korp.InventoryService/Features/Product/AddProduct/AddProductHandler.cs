@@ -20,7 +20,9 @@ public class AddProductHandler(InventoryDbContext inventoryDbContext)
         {
             Id = newProduct.Id,
             Name = newProduct.Name,
-            Balance = newProduct.Stock,
+            Stock = newProduct.Stock,
+            Reserved = newProduct.Reserved,
+            Available = newProduct.Available,
             CreatedAt = newProduct.CreatedAt
         };
     }
