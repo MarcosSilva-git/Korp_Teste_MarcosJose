@@ -1,10 +1,8 @@
 using Hangfire;
 using Hangfire.Storage.SQLite;
-using Korp.InvoiceService.Features.Invoice.CreateInvoice;
-using Korp.InvoiceService.Features.Invoice.GetInvoices;
-using Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Infraestructure.Http;
+using Korp.Shared.Extensions;
 using Korp.Shared.Middlewares;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,10 +18,9 @@ builder.Services.AddDbContext<InvoiceDbContext>(options =>
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-builder.Services.AddScoped<CreateInvoiceHandler>();
-builder.Services.AddScoped<GetInvoicesHandler>();
-builder.Services.AddScoped<ProcessStockDebitHandler>();
-builder.Services.AddScoped<RollbackProcessStockDebitHandler>();
+builder.Services
+    .AddApplicationHandlers()
+    .AddDispatcher();
 
 GlobalConfiguration.Configuration
     .UseSQLiteStorage("InvoiceServiceDb.db");

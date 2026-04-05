@@ -1,61 +1,45 @@
-﻿using Hangfire;
-using Hangfire.Server;
-using Korp.InvoiceService.Features.Invoice.Domain.Enums;
+﻿using Korp.InvoiceService.Features.Invoice.Domain.Enums;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Infraestructure.Http;
-using Korp.Shared.Attributes;
-using Microsoft.Build.Framework;
+using Korp.Shared.Abstractions;
+using Korp.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 
 public class RollbackProcessStockDebitHandler(
-    InvoiceDbContext invoiceDbContext,
-    InventoryServiceHttpClient inventoryService,
-    ILogger<RollbackProcessStockDebitHandler> logger)
+    InvoiceDbContext _invoiceDbContext,
+    InventoryServiceHttpClient _inventoryService,
+    ILogger<RollbackProcessStockDebitHandler> _logger) : IRequestHandlerAsync<RollbackStockDebitCommand, Result>
 {
-    private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
-    private readonly InventoryServiceHttpClient _inventoryService = inventoryService;
-    private readonly ILogger<RollbackProcessStockDebitHandler> _logger = logger;
-
-    [AutomaticRetry(Attempts = 10)]
-    public async Task HandleAsync([NotEmptyGuid] Guid sagaId, PerformContext? context)
+    public async Task<Result> HandleAsync(RollbackStockDebitCommand command, CancellationToken ct)
     {
         var invoice = await _invoiceDbContext.Invoices
-            .Where(i => i.SagaId == sagaId 
-                && i.InvoiceStatus == InvoiceStatusEnum.Processing)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(i => i.SagaId == command.SagaId, ct);
 
         if (invoice is null)
         {
-            _logger.LogError(
-                "Attempt to rollback stock debit for non-existing invoice with SagaId {SagaId} or with status not equal to Processing", sagaId);
-            return;
+            var errorMessage = $"Invoice with SagaId {command.SagaId} not found.";
+            _logger.LogError(errorMessage);
+
+            return errorMessage;
         }
 
-        try
+        if (invoice.InvoiceStatus == InvoiceStatusEnum.Closed || invoice.InvoiceStatus == InvoiceStatusEnum.Cancelled)
+            return Result.Success();
+
+        if (invoice.InvoiceStatus != InvoiceStatusEnum.Processing)
         {
-            var result = await _inventoryService.RollbackReserveProductsAsync(sagaId);
-
-            if (result.IsSuccess)
-            {
-                _logger.LogInformation("Rollback of sagaid {sagaid} was completed.", sagaId);
-
-                invoice.MarkAsCancelled();
-                await _invoiceDbContext.SaveChangesAsync();
-
-                return;
-            }
-
-            throw new Exception($"Rollback failed to Invoice {invoice.Id}: {result.Error}");
+            var errorMessage = $"Invoice with SagaId {command.SagaId} is in invalid status ({invoice.InvoiceStatus}). Cannot rollback stock debit.";
+            _logger.LogError(errorMessage);
+            return errorMessage;
         }
-        catch (Exception e)
-        {
-            int? currentRetry = context?.GetJobParameter<int>("RetryCount");
-            _logger.LogError(e, "Number of trys: {currentRetry}", currentRetry is null ? 1 : currentRetry + 2);
-            currentRetry ??= 0;
 
-            throw;
-        }
+        await _inventoryService.RollbackReserveProductsAsync(command.SagaId);
+
+        invoice.MarkAsCancelled();
+        await _invoiceDbContext.SaveChangesAsync(ct);
+
+        return Result.Success();
     }
 }

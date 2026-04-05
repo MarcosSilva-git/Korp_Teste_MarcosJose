@@ -27,3 +27,21 @@ public readonly record struct Result<T, E>
         Func<E, TResult> onFailure)
         => IsSuccess ? onSuccess(Value!) : onFailure(Error!);
 }
+
+public readonly record struct Result
+{
+    public readonly bool IsSuccess;
+    public bool IsFailure => !IsSuccess;
+    public readonly string? Error;
+
+    private Result(bool isSuccess, string? error)
+    {
+        IsSuccess = isSuccess;
+        Error = error;
+    }
+
+    public static Result Success() => new Result(true, null);
+    public static Result Fail(string error) => new Result(false, error);
+
+    public static implicit operator Result(string error) => Fail(error);
+}

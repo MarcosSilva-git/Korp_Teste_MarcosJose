@@ -4,6 +4,7 @@ using Korp.Shared.Abstractions;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Korp.InvoiceService.Infraestructure.Http;
 
@@ -12,10 +13,8 @@ public class InventoryServiceHttpClient(HttpClient httpClient)
     private readonly HttpClient _httpClient = httpClient;
     private const string ORIGIN_TYPE = "INVOICE_ID";
 
-    public async Task<Result<bool, string>> ReserveProductsAsync(InvoiceEntity invoice)
+    public async Task ReserveProductsAsync(InvoiceEntity invoice)
     {
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"/api/products/reserve");
-
         var body = new ReserveProductsRequest
         {
             Sagaid = invoice.SagaId,
@@ -28,44 +27,27 @@ public class InventoryServiceHttpClient(HttpClient httpClient)
             }).ToList(),
         };
 
-        requestMessage.Content = new StringContent(
-            JsonSerializer.Serialize(body),
-            Encoding.UTF8,
-            "application/json");
-
-        var response = await _httpClient.SendAsync(requestMessage);
+        var response = await _httpClient.PostAsJsonAsync("/api/products/reserve", body);
 
         if (response.IsSuccessStatusCode)
-            return true;
-            
-        var errorContent = await response.Content.ReadAsStringAsync();
+            return;
 
-        if (response.StatusCode == HttpStatusCode.BadRequest)
-            return errorContent;
+        var error = await response.Content.ReadAsStringAsync();
 
-        return errorContent;
+        throw new Exception($"Inventory Service failure ({response.StatusCode}): {error ?? "No message"}");
     }
 
-    public async Task<Result<bool, string>> RollbackReserveProductsAsync(Guid sagaId)
+    public async Task RollbackReserveProductsAsync(Guid sagaId)
     {
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/api/products/rollback")
-        {
-            Content = new StringContent(
-                JsonSerializer.Serialize(new { SagaId = sagaId.ToString() }),
-                Encoding.UTF8,
-                "application/json")
-        };
+        var body = new RollbackReserveProductsRequest { SagaId = sagaId };
 
-        var response = await _httpClient.SendAsync(requestMessage);
+        var response = await _httpClient.PostAsJsonAsync("/api/products/rollback", body);
 
         if (response.IsSuccessStatusCode)
-            return true;
+            return;
 
-        var errorContent = await response.Content.ReadAsStringAsync();
+        var error = await response.Content.ReadAsStringAsync();
 
-        if (response.StatusCode == HttpStatusCode.BadRequest)
-            return errorContent;
-
-        return errorContent;
+        throw new Exception($"Critical Inventory Service Rollback Error [{response.StatusCode}] for Saga {sagaId}: {error}");
     }
 }

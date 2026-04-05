@@ -9,25 +9,23 @@ using Korp.Shared.Interfaces;
 namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 public class CreateInvoiceHandler(
-    InvoiceDbContext invoiceDbContext,
-    ProcessStockDebitHandler processStockDebitHandler,
-    IBackgroundJobClient backgroundJobClient) : IRequestHandlerAsync<CreateInvoiceRequest, GetInvoiceResponse>
+    IDispatcher _dispatcher,
+    InvoiceDbContext _invoiceDbContext,
+    IBackgroundJobClient _backgroundJobClient) : IRequestHandlerAsync<CreateInvoiceRequest, GetInvoiceResponse>
 {
-    private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
-    private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
-    private readonly ProcessStockDebitHandler _processStockDebitHandler = processStockDebitHandler;
-
-    public async Task<GetInvoiceResponse> HandleAsync(CreateInvoiceRequest request)
+    public async Task<GetInvoiceResponse> HandleAsync(CreateInvoiceRequest request, CancellationToken ct)
     {
         var invoice = await AddPendingInvoice(request);
+        var newProcessStockDebitCommand = new ProcessStockDebitCommand(invoice.SagaId);
 
         try
         {
-            await _processStockDebitHandler.HandleAsync(invoice.SagaId, null);
+            await _dispatcher.SendAsync(newProcessStockDebitCommand, ct);
         }
         catch (Exception)
         {
-            _backgroundJobClient.Enqueue<ProcessStockDebitHandler>(x => x.HandleAsync(invoice.SagaId, null));
+            _backgroundJobClient.Enqueue<ProcessStockDebitHandler>(
+                x => x.HandleAsync(newProcessStockDebitCommand, ct));
         }
 
         return new GetInvoiceResponse()

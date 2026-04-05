@@ -1,71 +1,39 @@
-﻿using Hangfire;
-using Hangfire.Server;
-using Korp.InvoiceService.Features.Invoice.Domain.Enums;
+﻿using Korp.InvoiceService.Features.Invoice.Domain.Enums;
 using Korp.InvoiceService.Infraestructure;
 using Korp.InvoiceService.Infraestructure.Http;
-using Korp.Shared.Attributes;
+using Korp.Shared.Abstractions;
+using Korp.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 
 public class ProcessStockDebitHandler(
-    InventoryServiceHttpClient inventoryServiceHttpClient, 
-    InvoiceDbContext invoiceDbContext,
-    ILogger<ProcessStockDebitHandler> logger,
-    RollbackProcessStockDebitHandler rollbackHandler,
-    IBackgroundJobClient backgroundJobClient)
+    InventoryServiceHttpClient _inventoryServiceHttpClient,
+    InvoiceDbContext _invoiceDbContext) : IRequestHandlerAsync<ProcessStockDebitCommand, Result>
 {
-    private readonly InventoryServiceHttpClient _inventoryServiceHttpClient = inventoryServiceHttpClient;
-    private readonly InvoiceDbContext _invoiceDbContext = invoiceDbContext;
-    private readonly ILogger<ProcessStockDebitHandler> _logger = logger;
-    private readonly RollbackProcessStockDebitHandler _rollbackHandler = rollbackHandler;
-    private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
-
-    private const int MaxRetryAttempts = 1;
-
-    [AutomaticRetry(Attempts = MaxRetryAttempts, OnAttemptsExceeded = AttemptsExceededAction.Fail, DelaysInSeconds = new[] { 10 })]
-    public async Task HandleAsync([NotEmptyGuid] Guid sagaId, PerformContext? context)
+    public async Task<Result> HandleAsync(ProcessStockDebitCommand command, CancellationToken ct)
     {
         var invoice = await _invoiceDbContext.Invoices
-            .Where(i => i.SagaId == sagaId && i.InvoiceStatus == InvoiceStatusEnum.Processing)
-            .FirstOrDefaultAsync();
+            .Include(i => i.InvoiceItems)
+            .FirstOrDefaultAsync(i => i.SagaId == command.SagaId, ct);
 
         if (invoice is null)
-        {
-            _logger.LogError(
-                "Attempt to process stock debit for non-existing invoice with SagaId {SagaId} or with status not equal to Processing", sagaId);
-            return;
-        }
-        
-        try
-        {
-            var result = await _inventoryServiceHttpClient.ReserveProductsAsync(invoice);
+            return $"Invoice not found for SagaId {command.SagaId}";
 
-            if (result.IsSuccess)
-            {
-                invoice.MarkAsOpen();
-                await _invoiceDbContext.SaveChangesAsync();
+        if (invoice.InvoiceStatus == InvoiceStatusEnum.Cancelled)
+            return "Invoice is CANCELLED. Cannot debit stock.";
 
-                return;
-            }
+        if (invoice.InvoiceStatus == InvoiceStatusEnum.Open || invoice.InvoiceStatus == InvoiceStatusEnum.Closed)
+            return Result.Success();
 
-            throw new Exception($"Reserve failed to Invoice {invoice.Id}: {result.Error}");
-        }
-        catch (Exception e)
-        {
-            int? currentRetry = context?.GetJobParameter<int>("RetryCount");
+        if (invoice.InvoiceStatus != InvoiceStatusEnum.Processing)
+            return $"Invoice is in invalid status ({invoice.InvoiceStatus}). Cannot debit stock.";
 
-            _logger.LogError("Number of trys: {currentRetry}", currentRetry is null ? 1 : currentRetry + 2);
+        await _inventoryServiceHttpClient.ReserveProductsAsync(invoice);
 
-            currentRetry ??= 0;
+        invoice.MarkAsOpen();
+        await _invoiceDbContext.SaveChangesAsync(ct);
 
-            if (currentRetry >= MaxRetryAttempts)
-            {
-                _logger.LogError(e, "All attempts to process stock to invoce id {invoice} and saga id {saga} failed. Initialiazing cancelatioin process.", invoice.Id, sagaId);
-                _backgroundJobClient.Enqueue<ProcessStockDebitHandler>(x => x.HandleAsync(invoice.SagaId, null));
-            }
-            
-            throw;
-        }
+        return Result.Success();
     }
 }
