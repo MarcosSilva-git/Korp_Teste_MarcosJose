@@ -1,20 +1,20 @@
 ﻿using Korp.InventoryService.Features.Product.Domain;
 using Korp.InventoryService.Infraestructure;
-using Korp.InventoryService.Shared.DTOs.AddProduct;
-using Korp.InventoryService.Shared.DTOs.GetProducts;
+using Korp.InventoryService.Shared.DTOs.Product.AddProduct;
+using Korp.InventoryService.Shared.DTOs.Product.GetProducts;
+using Korp.Shared.Interfaces;
 
 namespace Korp.InventoryService.Features.Product.AddProduct;
 
-public class AddProductHandler(InventoryDbContext inventoryDbContext)
+public class AddProductHandler(InventoryDbContext _inventoryDbContext)
+    : IRequestHandlerAsync<AddProductRequest, GetProductsResponse>
 {
-    private readonly InventoryDbContext _inventoryDbContext = inventoryDbContext;
-
-    public async Task<GetProductsResponse> HandleAsync(AddProductRequest request)
+    public async Task<GetProductsResponse> HandleAsync(AddProductRequest request, CancellationToken ct)
     {
         var newProduct = new ProductEntity(request.Name, request.Stock);
 
         _inventoryDbContext.Add(newProduct);
-        await _inventoryDbContext.SaveChangesAsync();
+        await _inventoryDbContext.SaveChangesAsync(ct);
 
         return new()
         {

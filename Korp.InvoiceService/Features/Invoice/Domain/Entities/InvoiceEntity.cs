@@ -24,7 +24,7 @@ public class InvoiceEntity
     public void MarkAsOpen()
     {
         if (InvoiceStatus != InvoiceStatusEnum.Processing)
-            throw new InvalidInvoiceStateException("Cannot mark invoice as OPEN", InvoiceStatus);
+            throw new InvalidInvoiceStatusException("Cannot mark invoice as OPEN", InvoiceStatus);
 
         InvoiceStatus = InvoiceStatusEnum.Open;
     }
@@ -32,7 +32,7 @@ public class InvoiceEntity
     public void MarkAsClosed()
     {
         if (InvoiceStatus != InvoiceStatusEnum.Open)
-            throw new InvalidInvoiceStateException("Only OPEN invoices can be CLOSED", InvoiceStatus);
+            throw new InvalidInvoiceStatusException("Only OPEN invoices can be CLOSED", InvoiceStatus);
 
         InvoiceStatus = InvoiceStatusEnum.Closed;
     }
@@ -40,7 +40,7 @@ public class InvoiceEntity
     public void MarkAsCancelled()
     {
         if (InvoiceStatus != InvoiceStatusEnum.Processing)
-            throw new InvalidInvoiceStateException("Only PROCESSING invoices can be CANCELLED", InvoiceStatus);
+            throw new InvalidInvoiceStatusException("Only PROCESSING invoices can be CANCELLED", InvoiceStatus);
 
         InvoiceStatus = InvoiceStatusEnum.Cancelled;
     }

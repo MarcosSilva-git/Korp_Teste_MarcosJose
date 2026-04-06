@@ -13,6 +13,8 @@ public class ProductEntity : EntityBase
 
     public int Available => Stock - Reserved;
 
+    public ICollection<ReservedProductEntity>? Reservations { get; private set; }
+
     private ProductEntity() { }
 
     public ProductEntity(string name, int quantity)

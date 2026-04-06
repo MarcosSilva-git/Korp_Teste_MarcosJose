@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Korp.InventoryService.Shared.DTOs.ReserveProducts;
+namespace Korp.InventoryService.Shared.DTOs.Product.ReserveProducts;
 
 public class ReserveProductRequest
 {

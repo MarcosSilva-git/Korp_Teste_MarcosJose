@@ -1,10 +1,5 @@
-﻿using Korp.InventoryService.Shared.DTOs.ReserveProducts;
+﻿using Korp.InventoryService.Shared.DTOs.Product.ReserveProducts;
 using Korp.InvoiceService.Features.Invoice.Domain.Entities;
-using Korp.Shared.Abstractions;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Korp.InvoiceService.Infraestructure.Http;
 
@@ -41,7 +36,7 @@ public class InventoryServiceHttpClient(HttpClient httpClient)
     {
         var body = new RollbackReserveProductsRequest { SagaId = sagaId };
 
-        var response = await _httpClient.PostAsJsonAsync("/api/products/rollback", body);
+        var response = await _httpClient.PostAsJsonAsync("/api/products/reserve/rollback", body);
 
         if (response.IsSuccessStatusCode)
             return;

@@ -1,22 +1,26 @@
 ﻿using Korp.InventoryService.Infraestructure;
+using Korp.InventoryService.Shared.DTOs.Product.DeleteProduct;
 using Korp.Shared.Abstractions;
+using Korp.Shared.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InventoryService.Features.Product.DeleteProduct;
 
-public class DeleteProductHandler(InventoryDbContext inventoryDbContext)
+public class DeleteProductHandler(InventoryDbContext _inventoryDbContext)
+    : IRequestHandlerAsync<DeleteProductRequest, Result<DeleteProductResponse, ValidationResult>>
 {
-    private readonly InventoryDbContext _inventoryDbContext = inventoryDbContext;
-
-    public async Task<Result<int, Exception>> HandleAsync(int productId)
+    public async Task<Result<DeleteProductResponse, ValidationResult>> HandleAsync(DeleteProductRequest command, CancellationToken ct)
     {
-        var product = await _inventoryDbContext.Products.FindAsync(productId);
+        var product = await _inventoryDbContext.Products.FindAsync(command.ProductId);
 
         if (product is null)
-            return new FormatException($"Product with id {productId} was not found.");
+            return new ValidationResult($"Product with id {command.ProductId} was not found.", [ $"ProductId_{command.ProductId}" ]);
+
+
 
         product.DeletedAt = DateTime.UtcNow;
         await _inventoryDbContext.SaveChangesAsync();
 
-        return productId;
+        return new DeleteProductResponse(command.ProductId);
     }
 }

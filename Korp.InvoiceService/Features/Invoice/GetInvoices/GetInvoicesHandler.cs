@@ -1,5 +1,5 @@
 ﻿using Korp.InvoiceService.Infraestructure;
-using Korp.InvoiceService.Shared.DTOs.GetInvoices;
+using Korp.InvoiceService.Shared.DTOs.Invoice.GetInvoices;
 using Korp.Shared.Abstractions;
 using Korp.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -41,17 +41,17 @@ public class GetInvoicesHandler(
             query = query.Where(p => ids.Contains(p.Id));
 
         return await query
-               .Select(invoice => new GetInvoiceResponse()
-               {
-                   Id = invoice.Id,
-                   Status = invoice.InvoiceStatus.ToString(),
-                   CreatedAt = invoice.CreatedAt,
-                   items = invoice.InvoiceItems.Select(ii => new GetInvoiceItemResponse
-                   {
-                       ProductId = ii.ProductId,
-                       Quantity = ii.Quantity
-                   })
-               })
-               .ToListAsync(cancellationToken);
+            .Select(invoice => new GetInvoiceResponse()
+            {
+                Id = invoice.Id,
+                Status = invoice.InvoiceStatus.ToString(),
+                CreatedAt = invoice.CreatedAt,
+                items = invoice.InvoiceItems.Select(ii => new GetInvoiceItemResponse
+                {
+                    ProductId = ii.ProductId,
+                    Quantity = ii.Quantity
+                })
+            })
+            .ToListAsync(cancellationToken);
     }
 }

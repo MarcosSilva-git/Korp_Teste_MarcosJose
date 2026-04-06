@@ -1,4 +1,4 @@
-﻿namespace Korp.InventoryService.Shared.DTOs.GetProducts;
+﻿namespace Korp.InventoryService.Shared.DTOs.Product.GetProducts;
 
 public class GetProductsResponse
 {

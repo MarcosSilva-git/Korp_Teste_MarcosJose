@@ -1,19 +1,20 @@
 ﻿using Korp.InventoryService.Infraestructure;
-using Korp.InventoryService.Shared.DTOs.GetProducts;
+using Korp.InventoryService.Shared.DTOs.Product.GetProducts;
 using Korp.Shared.Abstractions;
+using Korp.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InventoryService.Features.Product.GetProducts;
 
-public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<GetProductsHandler> logger)
+public class GetProductsHandler(
+    InventoryDbContext _inventoryDbContext, 
+    ILogger<GetProductsHandler> _logger) : IRequestHandlerAsync<GetProductsRequest, Result<IEnumerable<GetProductsResponse>, ValidationResult>>
 {
-    private readonly InventoryDbContext _inventoryDbContext = inventoryDbContext;
-    private readonly ILogger<GetProductsHandler> _logger = logger;
 
-    public async Task<Result<IEnumerable<GetProductsResponse>, ValidationResult>> HandlerAsync(string? ids, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<GetProductsResponse>, ValidationResult>> HandleAsync(GetProductsRequest request, CancellationToken ct)
     {
-        if (ids is null || string.IsNullOrWhiteSpace(ids))
+        if (request.Ids is null || string.IsNullOrWhiteSpace(request.Ids))
         {
             return await _inventoryDbContext
                 .Products
@@ -27,19 +28,19 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
                     Available = p.Available,
                     CreatedAt = p.CreatedAt,
                 })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(ct);
         }
 
         SortedSet<int> idSet;
 
         try
         {
-            idSet = [.. ids.Split(',').Select(int.Parse)];
+            idSet = [.. request.Ids.Split(',').Select(int.Parse)];
         }
         catch (FormatException e)
         {
-            _logger.LogWarning(e, "Failed to parse IDs from query string: {Ids}", ids);
-            return new ValidationResult("One or more IDs could not be converted to integers.", [nameof(ids)]);
+            _logger.LogWarning(e, "Failed to parse IDs from query string: {Ids}", request.Ids);
+            return new ValidationResult("One or more IDs could not be converted to integers.", [nameof(request.Ids)]);
         }
 
         return await _inventoryDbContext
@@ -55,6 +56,6 @@ public class GetProductsHandler(InventoryDbContext inventoryDbContext, ILogger<G
                 Available = p.Available,
                 CreatedAt = p.CreatedAt,
             })
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
     }
 }

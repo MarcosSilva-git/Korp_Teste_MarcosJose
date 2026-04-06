@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Korp.InventoryService.Features.Product.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Korp.InventoryService.Features.Product.Domain.EntityConfigurations;
@@ -9,14 +10,17 @@ public class ReservedProductEntityConfiguration : IEntityTypeConfiguration<Reser
     {
         builder.ToTable("ReservedProducts");
 
-        builder.HasKey(builder => builder.Id);
+        builder.HasKey(rp => rp.Id);
 
-        builder.Property(builder => builder.Id)
+        builder.Property(rp => rp.Id)
             .ValueGeneratedOnAdd();
+
+        builder.Property(builder => builder.StockMovementStatus)
+           .HasConversion(
+                e => e.ToString(),
+                e => Enum.Parse<StockMovementStatusEnum>(e));
 
         builder.Property(p => p.Version)
             .IsConcurrencyToken();
-
-        builder.HasQueryFilter(p => p.DeletedAt == null);
     }
 }

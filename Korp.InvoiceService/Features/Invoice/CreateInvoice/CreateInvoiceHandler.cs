@@ -2,47 +2,23 @@
 using Korp.InvoiceService.Features.Invoice.Domain.Entities;
 using Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 using Korp.InvoiceService.Infraestructure;
-using Korp.InvoiceService.Shared.DTOs.CreateInvoice;
-using Korp.InvoiceService.Shared.DTOs.GetInvoices;
+using Korp.InvoiceService.Shared.DTOs.Invoice.CreateInvoice;
 using Korp.Shared.Interfaces;
 
 namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 public class CreateInvoiceHandler(
-    IDispatcher _dispatcher,
     InvoiceDbContext _invoiceDbContext,
-    IBackgroundJobClient _backgroundJobClient) : IRequestHandlerAsync<CreateInvoiceRequest, GetInvoiceResponse>
+    IBackgroundJobClient _backgroundJobClient) : IRequestHandlerAsync<CreateInvoiceRequest, CreateInvoiceResponse>
 {
-    public async Task<GetInvoiceResponse> HandleAsync(CreateInvoiceRequest request, CancellationToken ct)
+    public async Task<CreateInvoiceResponse> HandleAsync(CreateInvoiceRequest request, CancellationToken ct)
     {
         var invoice = await AddPendingInvoice(request);
-        var newProcessStockDebitCommand = new ProcessStockDebitCommand(invoice.SagaId);
 
-        try
-        {
-            await _dispatcher.SendAsync(newProcessStockDebitCommand, ct);
-        }
-        catch (Exception)
-        {
-            _backgroundJobClient.Enqueue<ProcessStockDebitHandler>(
-                x => x.HandleAsync(newProcessStockDebitCommand, ct));
-        }
+        _backgroundJobClient.Enqueue<ProcessStockDebitJob>(
+            x => x.RunAsync(new ProcessStockDebitCommand(invoice.SagaId), null));
 
-        return new GetInvoiceResponse()
-        {
-            Id = invoice.Id,
-            CreatedAt = invoice.CreatedAt,
-            Status = invoice.InvoiceStatus.ToString(),
-            items = invoice.InvoiceItems.Select(i => new GetInvoiceItemResponse()
-            {
-                Id = i.Id,
-                Quantity = i.Quantity,
-                ProductId = i.ProductId,
-                CreatedDate = i.CreatedAt,
-                ProductName = i.ProductName,
-                ItemSequence = i.ItemSequence,
-            }),
-        };
+        return new CreateInvoiceResponse(invoice.Id);
     }
 
     public async Task<InvoiceEntity> AddPendingInvoice(CreateInvoiceRequest request)

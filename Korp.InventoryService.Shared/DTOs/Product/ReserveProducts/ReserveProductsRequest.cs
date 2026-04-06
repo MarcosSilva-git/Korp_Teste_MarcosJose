@@ -1,9 +1,11 @@
-﻿using Korp.Shared.Attributes;
+﻿using Korp.Shared.Abstractions;
+using Korp.Shared.Attributes;
+using Korp.Shared.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
-namespace Korp.InventoryService.Shared.DTOs.ReserveProducts;
+namespace Korp.InventoryService.Shared.DTOs.Product.ReserveProducts;
 
-public class ReserveProductsRequest
+public class ReserveProductsRequest : IRequest<Result<bool, List<ValidationResult>>>
 {
     [NotEmptyGuid]
     public Guid Sagaid { get; set; }

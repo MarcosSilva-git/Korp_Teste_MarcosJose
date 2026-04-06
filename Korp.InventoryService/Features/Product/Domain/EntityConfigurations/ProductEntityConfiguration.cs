@@ -23,6 +23,13 @@ public class ProductEntityConfiguration : IEntityTypeConfiguration<ProductEntity
         builder.Property(p => p.Version)
             .IsConcurrencyToken();
 
+        builder
+            .HasMany(p => p.Reservations)
+            .WithOne(rp => rp.Product)
+            .HasForeignKey(rp => rp.ProductId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasQueryFilter(p => p.DeletedAt == null);
     }
 }

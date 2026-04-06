@@ -2,7 +2,7 @@
 using Korp.Shared.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
-namespace Korp.InvoiceService.Shared.DTOs.GetInvoices;
+namespace Korp.InvoiceService.Shared.DTOs.Invoice.GetInvoices;
 
 public record GetInvoicesQuery : IRequest<Result<List<GetInvoiceResponse>, ValidationResult>>
 {

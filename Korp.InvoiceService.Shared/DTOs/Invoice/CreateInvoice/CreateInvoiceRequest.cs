@@ -1,6 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Korp.Shared.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
-namespace Korp.InvoiceService.Shared.DTOs.CreateInvoice;
+namespace Korp.InvoiceService.Shared.DTOs.Invoice.CreateInvoice;
+
+public class CreateInvoiceRequest : IRequest<CreateInvoiceResponse>
+{
+    [MinLength(1, ErrorMessage = "{0} must contain at least one item.")]
+    public List<CreateInvoiceitemRequest> InvoiceItems { get; set; } = new();
+}
 
 public class CreateInvoiceitemRequest
 {

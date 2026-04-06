@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Korp.InventoryService.Shared.DTOs;
+namespace Korp.InventoryService.Shared.DTOs.Product.UpdateProduct;
 
 public class UpdateProductRequest
 {

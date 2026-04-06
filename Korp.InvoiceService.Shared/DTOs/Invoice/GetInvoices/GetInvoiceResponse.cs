@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Korp.InvoiceService.Shared.DTOs.GetInvoices;
+namespace Korp.InvoiceService.Shared.DTOs.Invoice.GetInvoices;
 
 public class GetInvoiceResponse
 {

@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Hangfire.Server;
 using Korp.Shared.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Korp.InvoiceService.Features.Invoice.ProcessStockDebit;
 
@@ -9,19 +10,19 @@ public class ProcessStockDebitJob(
     IBackgroundJobClient _backgroundJobClient,
     ILogger<ProcessStockDebitJob> _logger)
 {
-    private const int MaxAttempts = 10;
+    private const int MaxAttempts = 1;
 
     [AutomaticRetry(Attempts = MaxAttempts)]
-    public async Task RunAsync(Guid sagaId, PerformContext? context)
+    public async Task RunAsync(ProcessStockDebitCommand command, PerformContext? context)
     {
         try
         {
-            var result = await _dispatcher.SendAsync(new ProcessStockDebitCommand(sagaId));
+            var result = await _dispatcher.SendAsync(command);
 
             if (result.IsFailure)
             {
-                _logger.LogWarning("Business failure for Saga {SagaId}: {Error}. Starting Rollback.", sagaId, result.Error);
-                _backgroundJobClient.Enqueue<ProcessStockDebitJob>(x => x.RunRollbackAsync(sagaId));
+                _logger.LogWarning("Business failure for Saga {SagaId}: {Error}. Starting Rollback.", command.SagaId, result.Error);
+                _backgroundJobClient.Enqueue<ProcessStockDebitJob>(x => x.RunRollbackAsync(command));
                 return;
             }
         }
@@ -31,8 +32,9 @@ public class ProcessStockDebitJob(
 
             if (retryCount >= (MaxAttempts - 1))
             {
-                _logger.LogCritical(e, "Final attempt failed for Saga {SagaId}. Starting Rollback.", sagaId);
-                _backgroundJobClient.Enqueue<ProcessStockDebitJob>(x => x.RunRollbackAsync(sagaId));
+                _logger.LogCritical(e, "Final attempt failed for Saga {SagaId}. Starting Rollback.", command.SagaId);
+                _backgroundJobClient.Enqueue<ProcessStockDebitJob>(x => x.RunRollbackAsync(command));
+                return;
             }
 
             throw;
@@ -40,11 +42,11 @@ public class ProcessStockDebitJob(
     }
 
     [AutomaticRetry]
-    public async Task RunRollbackAsync(Guid sagaId)
+    public async Task RunRollbackAsync(ProcessStockDebitCommand command)
     {
-        var result = await _dispatcher.SendAsync(new RollbackStockDebitCommand(sagaId));
+        var result = await _dispatcher.SendAsync(new RollbackStockDebitCommand(command.SagaId));
 
         if (result.IsFailure)
-            throw new Exception($"Rollback failed for Saga {sagaId}: {result.Error}");
+            throw new Exception($"Rollback failed for Saga {command.SagaId}: {result.Error}");
     }
 }

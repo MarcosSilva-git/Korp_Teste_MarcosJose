@@ -1,44 +1,44 @@
 ﻿using Korp.InventoryService.Infraestructure;
-using Korp.InventoryService.Shared.DTOs;
-using Korp.InventoryService.Shared.DTOs.GetProducts;
+using Korp.InventoryService.Shared.DTOs.Product.GetProducts;
+using Korp.InventoryService.Shared.DTOs.Product.UpdateProduct;
 using Korp.Shared.Abstractions;
+using Korp.Shared.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InventoryService.Features.Product.UpdateProduct;
 
-public class UpdateProductHandler(InventoryDbContext inventoryDbContext)
+public class UpdateProductHandler(InventoryDbContext _inventoryDbContext)
+    : IRequestHandlerAsync<UpdateProductCommand, Result<GetProductsResponse, ValidationResult>>
 {
-    private readonly InventoryDbContext _inventoryDbContext = inventoryDbContext;
-
-    public async Task<Result<GetProductsResponse, ValidationResult>> HandlerAsync(int productId, UpdateProductRequest request)
+    public async Task<Result<GetProductsResponse, ValidationResult>> HandleAsync(UpdateProductCommand command, CancellationToken ct)
     {
-        var product = await _inventoryDbContext.Products.FindAsync(productId);
+        var product = await _inventoryDbContext.Products.FindAsync(command.Id);
 
         if (product is null)
-            return new ValidationResult($"Product with id {productId} was not found.", [$"ProductId_{productId}"]);
+            return new ValidationResult($"Product with id {command.Id} was not found.", [$"ProductId_{command.Id}"]);
 
-        product.ChangeName(request.Name);
+        product.ChangeName(command.Name);
 
         if (product.Stock == 0)
         {
-            product.UpdateStock(request.Stock);
+            product.UpdateStock(command.Stock);
         }
-        else if (request.Stock < product.Stock && request.Stock < product.Reserved)
+        else if (command.Stock < product.Stock && command.Stock < product.Reserved)
         {
             return new ValidationResult(
-                $"The requested quantity exceeds the current available balance for this product. Available: {product.Available}, Requested: {request.Stock}", 
-                [$"ProductId_{productId}"]);
+                $"The requested quantity exceeds the current available balance for this product. Available: {product.Available}, Requested: {command.Stock}", 
+                [$"ProductId_{command.Id}"]);
         }
         else
         {
             throw new InvalidOperationException(
-                $"Invalid stock transition for ProductId: {productId}. " +
+                $"Invalid stock transition for ProductId: {command.Id}. " +
                 $"Available: {product.Available}, " +
                 $"Reserved: {product.Reserved}, " +
-                $"Requested: {request.Stock}");
+                $"Requested: {command.Stock}");
         }
 
-        await _inventoryDbContext.SaveChangesAsync();
+        await _inventoryDbContext.SaveChangesAsync(ct);
 
         return new GetProductsResponse
         {

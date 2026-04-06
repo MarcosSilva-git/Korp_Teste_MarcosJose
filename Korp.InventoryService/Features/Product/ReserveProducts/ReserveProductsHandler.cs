@@ -1,18 +1,18 @@
 ﻿using Korp.InventoryService.Features.Product.Domain;
 using Korp.InventoryService.Infraestructure;
-using Korp.InventoryService.Shared.DTOs.ReserveProducts;
+using Korp.InventoryService.Shared.DTOs.Product.ReserveProducts;
 using Korp.Shared.Abstractions;
+using Korp.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InventoryService.Features.Product.ReserveProducts;
 
-public class ReserveProductsHandler(InventoryDbContext inventoryDbContext, ILogger<ReserveProductsHandler> logger)
+public class ReserveProductsHandler(
+    InventoryDbContext _inventoryDbContext, 
+    ILogger<ReserveProductsHandler> _logger) : IRequestHandlerAsync<ReserveProductsRequest, Result<bool, List<ValidationResult>>>
 {
-    private readonly InventoryDbContext _inventoryDbContext = inventoryDbContext;
-    private readonly ILogger<ReserveProductsHandler> _logger = logger;
-
-    public async Task<Result<bool, List<ValidationResult>>> HandleAsync(ReserveProductsRequest request)
+    public async Task<Result<bool, List<ValidationResult>>> HandleAsync(ReserveProductsRequest request, CancellationToken _)
     {
         var ids = new List<int>(request.Products.Count);
 

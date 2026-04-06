@@ -1,4 +1,5 @@
-﻿using Korp.InventoryService.Infraestructure;
+﻿using Korp.InventoryService.Features.Product.Domain.Enums;
+using Korp.InventoryService.Infraestructure;
 
 namespace Korp.InventoryService.Features.Product.Domain;
 
@@ -12,8 +13,9 @@ public class ReservedProductEntity : EntityBase
     public int Quantity { get; private set; }
 
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
-    public DateTime? RolledbackAt { get; set; }
-    public DateTime? DeletedAt { get; set; }
+    public StockMovementStatusEnum StockMovementStatus { get; private set; } = StockMovementStatusEnum.Reserved;
+
+    public ProductEntity? Product { get; private set; }
 
     public ReservedProductEntity(int productId, Guid sagaId, int quantity, string originId, string originType)
     {
@@ -28,7 +30,25 @@ public class ReservedProductEntity : EntityBase
     {
         Quantity = quantity;
 
-        if (Quantity <= 0) 
+        if (Quantity <= 0)
             throw new InvalidOperationException("Quantity must be greater than zero.");
+    }
+
+    public void MarkAsCommitted()
+    {
+        EnsureIsPending();
+        StockMovementStatus = StockMovementStatusEnum.Committed;
+    }
+
+    public void MarkAsRolledBack()
+    {
+        EnsureIsPending();
+        StockMovementStatus = StockMovementStatusEnum.RolledBack;
+    }
+
+    private void EnsureIsPending()
+    {
+        if (StockMovementStatus != StockMovementStatusEnum.Reserved)
+            throw new InvalidOperationException($"Reservation is already finalized as {StockMovementStatus}.");
     }
 }

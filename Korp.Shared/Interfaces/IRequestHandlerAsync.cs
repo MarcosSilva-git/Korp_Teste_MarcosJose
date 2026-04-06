@@ -2,5 +2,5 @@
 
 public interface IRequestHandlerAsync<TRequest, TResponse> : IRequest<TResponse>
 {
-    public Task<TResponse> HandleAsync(TRequest request, CancellationToken cancelationToken = default);
+    public Task<TResponse> HandleAsync(TRequest request, CancellationToken ct = default);
 }

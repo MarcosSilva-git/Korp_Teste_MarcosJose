@@ -1,4 +1,4 @@
-﻿namespace Korp.InvoiceService.Shared.DTOs.GetInvoices;
+﻿namespace Korp.InvoiceService.Shared.DTOs.Invoice.GetInvoices;
 
 public class GetInvoiceItemResponse
 {
