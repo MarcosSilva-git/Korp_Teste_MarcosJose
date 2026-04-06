@@ -16,9 +16,7 @@ public class DeleteProductHandler(InventoryDbContext _inventoryDbContext)
         if (product is null)
             return new ValidationResult($"Product with id {command.ProductId} was not found.", [ $"ProductId_{command.ProductId}" ]);
 
-
-
-        product.DeletedAt = DateTime.UtcNow;
+        product.DeletedAt = DateTimeOffset.UtcNow;
         await _inventoryDbContext.SaveChangesAsync();
 
         return new DeleteProductResponse(command.ProductId);

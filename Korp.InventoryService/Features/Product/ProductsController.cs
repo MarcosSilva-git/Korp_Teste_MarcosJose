@@ -4,6 +4,7 @@ using Korp.InventoryService.Features.Product.GetProducts;
 using Korp.InventoryService.Features.Product.ReserveProducts;
 using Korp.InventoryService.Features.Product.UpdateProduct;
 using Korp.InventoryService.Shared.DTOs.Product.AddProduct;
+using Korp.InventoryService.Shared.DTOs.Product.CommitReservedProducts;
 using Korp.InventoryService.Shared.DTOs.Product.DeleteProduct;
 using Korp.InventoryService.Shared.DTOs.Product.GetProducts;
 using Korp.InventoryService.Shared.DTOs.Product.ReserveProducts;
@@ -66,9 +67,20 @@ public class ProductsController(IDispatcher _dispatcher) : SharedControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
-        var result = await _dispatcher.SendAsync(new DeleteProductRequest(id));
+        var result = await _dispatcher.SendAsync(new DeleteProductRequest(id), ct);
+
+        if (result.IsFailure)
+            return CreateValidationProblemFromResult(result);
+
+        return NoContent();
+    }
+
+    [HttpPost("reserve/commit")]
+    public async Task<IActionResult> Commit(CommitReservedProductsRequest request, CancellationToken ct)
+    {
+        var result = await _dispatcher.SendAsync(request, ct);
 
         if (result.IsFailure)
             return CreateValidationProblemFromResult(result);

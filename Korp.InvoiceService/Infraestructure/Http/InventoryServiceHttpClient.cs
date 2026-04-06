@@ -1,4 +1,5 @@
-﻿using Korp.InventoryService.Shared.DTOs.Product.ReserveProducts;
+﻿using Korp.InventoryService.Shared.DTOs.Product.CommitReservedProducts;
+using Korp.InventoryService.Shared.DTOs.Product.ReserveProducts;
 using Korp.InvoiceService.Features.Invoice.Domain.Entities;
 
 namespace Korp.InvoiceService.Infraestructure.Http;
@@ -44,5 +45,17 @@ public class InventoryServiceHttpClient(HttpClient httpClient)
         var error = await response.Content.ReadAsStringAsync();
 
         throw new Exception($"Critical Inventory Service Rollback Error [{response.StatusCode}] for Saga {sagaId}: {error}");
+    }
+
+    public async Task CommitProductsAsync(Guid sagaId)
+    {
+        var response = await _httpClient.PostAsJsonAsync("/api/products/reserve/commit", new CommitReservedProductsRequest(sagaId));
+
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var error = await response.Content.ReadAsStringAsync();
+
+        throw new Exception($"Critical Inventory Service Commit Error [{response.StatusCode}] for Saga {sagaId}: {error}");
     }
 }

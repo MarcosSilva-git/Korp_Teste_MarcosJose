@@ -36,7 +36,7 @@ public class CommitReservedProductsHandler(
             }
 
             reservedProduct.MarkAsCommitted();
-            reservedProduct.Product.RemoveReservation(reservedProduct.Quantity);
+            reservedProduct.Product.DeleteReservation(reservedProduct.Quantity);
         }
 
         if (validationErrors.Count > 0)

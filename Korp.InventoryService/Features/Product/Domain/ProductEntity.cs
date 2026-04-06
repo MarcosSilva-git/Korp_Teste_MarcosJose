@@ -57,4 +57,13 @@ public class ProductEntity : EntityBase
 
         Reserved -= quantity;
     }
+
+    public void DeleteReservation(int quantity)
+    {
+        if (quantity > Reserved)
+            throw new InvalidOperationException("Not Allowed");
+
+        Reserved -= quantity;
+        Stock -= quantity;
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using Korp.InvoiceService.Features.Invoice.Domain.Enums;
 using Korp.InvoiceService.Features.Invoice.Domain.Exceptions;
 using Korp.InvoiceService.Infraestructure;
+using Korp.InvoiceService.Infraestructure.Http;
 using Korp.InvoiceService.Shared.DTOs.Invoice.CloseInvoice;
 using Korp.Shared.Abstractions;
 using Korp.Shared.Interfaces;
@@ -8,7 +9,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InvoiceService.Features.Invoice.CloseInvoice;
 
-public class CloseInvoiceHandler(InvoiceDbContext _invoiceDbContext) 
+public class CloseInvoiceHandler(
+    InvoiceDbContext _invoiceDbContext,
+    InventoryServiceHttpClient _inventoryServiceHttpClient) 
     : IRequestHandlerAsync<CloseInvoiceRequest, Result<CloseInvoiceResponse, ValidationResult>>
 {
     public async Task<Result<CloseInvoiceResponse, ValidationResult>> HandleAsync(CloseInvoiceRequest request, CancellationToken ct)
@@ -29,6 +32,8 @@ public class CloseInvoiceHandler(InvoiceDbContext _invoiceDbContext)
 
         if (invoice.InvoiceStatus != InvoiceStatusEnum.Open)
             throw new InvalidInvoiceStatusException("Unable to close invoice with invalid status:", invoice.InvoiceStatus);
+
+        await _inventoryServiceHttpClient.CommitProductsAsync(invoice.SagaId);
 
         invoice.MarkAsClosed();
         await _invoiceDbContext.SaveChangesAsync(ct);
