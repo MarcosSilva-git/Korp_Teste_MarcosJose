@@ -17,5 +17,9 @@ export type InvoiceItem = {
 
 export type InvoiceStatus = 'Open' | 'Processing' | 'Closed' | 'Cancelled';
 
-export type CreateInvoice = Pick<Invoice, 'items'>;
-export type CreateInvoiceItem = Pick<InvoiceItem, 'productId' | 'productName' | 'quantity'>
+export type CreateOrUpdateInvoice = {
+    id?: number
+    items: CreateOrUpdateInvoiceItem[]
+}
+
+export type CreateOrUpdateInvoiceItem = Pick<InvoiceItem, 'productId' | 'productName' | 'quantity'>

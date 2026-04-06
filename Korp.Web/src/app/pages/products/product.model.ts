@@ -7,4 +7,4 @@ export type Product = {
     createdAt: Date
 }
 
-export type CreateOrUpdateProductInput = Pick<Product, 'id' | 'name' | 'stock'>;
+export type CreateOrUpdateProduct = Pick<Product, 'id' | 'name' | 'stock'>;

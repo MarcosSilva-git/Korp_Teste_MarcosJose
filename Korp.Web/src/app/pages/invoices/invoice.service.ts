@@ -3,7 +3,7 @@ import { BaseService } from "../../core/base.service";
 import { environment } from "../../enviroment";
 import { catchError, Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { Invoice } from "./invoice.model";
+import { CreateOrUpdateInvoice, Invoice } from "./invoice.model";
 import { DefaultListResponse } from "../../core/models/default-list-response.model";
 
 @Injectable({
@@ -20,9 +20,15 @@ export class InvoiceService extends BaseService {
             .pipe(catchError(this.catchProblemDetailsError))
     }
     
-    // print(invoice: Invoice): Observable<Pick<Invoice, 'id'>> {
-    //     return this.http
-    //         .post<Pick<Invoice, 'id'>>(this.url + '/' + invoice.id + '/close', null)
-    //         .pipe(catchError(this.catchProblemDetailsError))
-    // }
+    create(invoice: CreateOrUpdateInvoice): Observable<Invoice> {
+        return this.http
+            .post<Invoice>(this.url, invoice)
+            .pipe(catchError(this.catchProblemDetailsError))
+    }
+
+    print(invoice: Invoice): Observable<Pick<Invoice, 'id'>> {
+        return this.http
+            .post<Pick<Invoice, 'id'>>(this.url + '/' + invoice.id + '/close', null)
+            .pipe(catchError(this.catchProblemDetailsError))
+    }
 }

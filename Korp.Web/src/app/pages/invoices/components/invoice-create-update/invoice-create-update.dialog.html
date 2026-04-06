@@ -1,0 +1,62 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content>
+    <div>
+        <mat-form-field appearance="outline">
+            <mat-label>Produto</mat-label>
+            <mat-select #mySelect>
+                @for(product of products; track product.id) {
+                    <mat-option  
+                        [value]="product">{{ product.id }} - {{ product.name }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field  appearance="outline" style="margin-left: 1rem;">
+            <mat-label>Quantidade</mat-label>
+            <input matInput type="number" #quantityInput>
+        </mat-form-field>
+
+        <button mat-raised-button type="button" color="primary" (click)="addItem(mySelect.value, quantityInput.value)" style="margin-left: 1rem;">
+            <mat-icon>add</mat-icon>
+            Adicionar Item
+        </button>
+    </div>
+
+
+    <div>
+        <table style="width: 100%;">
+            <thead style="width: 100%;">
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Quantidade</th>
+                <th></th>
+            </thead>
+            <tbody style="text-align: center;">
+                @for (item of items; track item.productId) {
+                    <tr>
+                        <td>{{ item.productId }}</td>
+                        <td>{{ item.productName }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td width="100px">
+                            <button mat-icon-button type="button" (click)="removeItem(item)" [disabled]="isAddingInvoice" style="margin-left: 1rem;">
+                                <mat-icon color="warn">delete</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (items.length == 0) {
+        <div class="empty-items">
+            <p>Nenhum item adicionado. Clique em "Adicionar Item" para começar.</p>
+        </div>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()" [disabled]="isAddingInvoice">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="submit()" [disabled]="items.length == 0" [disabled]="isAddingInvoice">Salvar</button>
+</mat-dialog-actions>

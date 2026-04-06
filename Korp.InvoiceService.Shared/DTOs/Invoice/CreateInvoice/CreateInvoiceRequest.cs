@@ -6,7 +6,7 @@ namespace Korp.InvoiceService.Shared.DTOs.Invoice.CreateInvoice;
 public class CreateInvoiceRequest : IRequest<CreateInvoiceResponse>
 {
     [MinLength(1, ErrorMessage = "{0} must contain at least one item.")]
-    public List<CreateInvoiceitemRequest> InvoiceItems { get; set; } = new();
+    public List<CreateInvoiceitemRequest> Items { get; set; } = new();
 }
 
 public class CreateInvoiceitemRequest

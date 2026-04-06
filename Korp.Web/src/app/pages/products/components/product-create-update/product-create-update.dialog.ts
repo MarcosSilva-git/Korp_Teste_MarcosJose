@@ -4,8 +4,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { CreateOrUpdateProductInput, Product } from '../../product.model';
+import { CreateOrUpdateProduct, Product } from '../../product.model';
 import { ProductService } from '../../product.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface ProductCreateUpdateDialogData {
   product?: Product
@@ -26,10 +27,11 @@ type ProductForm = {
   styleUrl: './product-create-update.dialog.css'
 })
 export class ProductCreateUpdateDialogComponent implements OnInit {
-  readonly _productService = inject(ProductService)
-  readonly dialogRef = inject(MatDialogRef<ProductCreateUpdateDialogComponent>);
-  readonly data: ProductCreateUpdateDialogData = inject(MAT_DIALOG_DATA);
-
+  _productService = inject(ProductService)
+  dialogRef = inject(MatDialogRef<ProductCreateUpdateDialogComponent>);
+  data: ProductCreateUpdateDialogData = inject(MAT_DIALOG_DATA);
+  _snackBar = inject(MatSnackBar);
+  
   productForm = new FormGroup<ProductForm>({
     id: new FormControl(),
     name: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]),
@@ -63,7 +65,7 @@ export class ProductCreateUpdateDialogComponent implements OnInit {
   }
 
   createProduct(productForm: FormGroup<ProductForm>) {
-      const product : CreateOrUpdateProductInput = {
+      const product : CreateOrUpdateProduct = {
         id: this.productForm.value.id!,
         name: this.productForm.value.name!,
         stock: this.productForm.value.stock!, 
@@ -73,7 +75,7 @@ export class ProductCreateUpdateDialogComponent implements OnInit {
         .create(product)
         .subscribe({
           next: () => {
-            alert(`Produto criado`)
+            this._snackBar.open("Produto criado com sucesso")
             this.dialogRef.close(product);
           },
           error: () => {
@@ -83,7 +85,7 @@ export class ProductCreateUpdateDialogComponent implements OnInit {
   }
 
   updateProduct(productForm: FormGroup<ProductForm>) {
-    const product : CreateOrUpdateProductInput = {
+    const product : CreateOrUpdateProduct = {
       id: this.productForm.value.id!,
       name: this.productForm.value.name!,
       stock: this.productForm.value.stock!, 
@@ -93,7 +95,7 @@ export class ProductCreateUpdateDialogComponent implements OnInit {
       .update(product)
       .subscribe({
         next: () => {
-          alert(`Produto atualizado`)
+          this._snackBar.open("Produto atualizado com sucesso")
           this.dialogRef.close(product);
         },
         error: () => {

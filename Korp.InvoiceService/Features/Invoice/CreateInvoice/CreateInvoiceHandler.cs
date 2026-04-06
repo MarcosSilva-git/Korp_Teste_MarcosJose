@@ -8,6 +8,7 @@ using Korp.Shared.Interfaces;
 namespace Korp.InvoiceService.Features.Invoice.CreateInvoice;
 
 public class CreateInvoiceHandler(
+    IDispatcher _dispatcher,
     InvoiceDbContext _invoiceDbContext,
     IBackgroundJobClient _backgroundJobClient) : IRequestHandlerAsync<CreateInvoiceRequest, CreateInvoiceResponse>
 {
@@ -15,15 +16,23 @@ public class CreateInvoiceHandler(
     {
         var invoice = await AddPendingInvoice(request);
 
-        _backgroundJobClient.Enqueue<ProcessStockDebitJob>(
-            x => x.RunAsync(new ProcessStockDebitCommand(invoice.SagaId), null));
+        try
+        {
+            await _dispatcher.SendAsync(new ProcessStockDebitCommand(invoice.SagaId), ct);
+        }
+        catch (Exception)
+        {
+            _backgroundJobClient.Enqueue<ProcessStockDebitJob>(
+                x => x.RunAsync(new ProcessStockDebitCommand(invoice.SagaId), null));
+        }
+
 
         return new CreateInvoiceResponse(invoice.Id);
     }
 
     public async Task<InvoiceEntity> AddPendingInvoice(CreateInvoiceRequest request)
     {
-        var items = request.InvoiceItems
+        var items = request.Items
             .Select((i, count) => new InvoiceItemEntity(i.ProductId, i.ProductName, i.Quantity, count + 1))
             .ToList();
 

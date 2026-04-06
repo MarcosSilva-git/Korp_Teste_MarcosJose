@@ -21,7 +21,7 @@ public class ReserveProductsHandler(
 
         var products = await GetProductsAsync(ids);
 
-        // await Task.Delay(2_000);
+        await Task.Delay(2_000);
 
         var validationErrors = ValidateIdsExistence(ids, products);
         if (validationErrors.Any()) 

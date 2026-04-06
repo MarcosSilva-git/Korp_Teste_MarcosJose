@@ -33,9 +33,22 @@
             <button mat-icon-button color="primary" (click)="openDialog(invoice)">
                 <mat-icon>edit</mat-icon>
             </button>
-            <!-- <button  mat-icon-button color="warn" (click)="print(invoice)">
-                <mat-icon>delete</mat-icon>
-            </button> -->
+
+            <button mat-icon-button 
+                color="primary" 
+                (click)="print(invoice)" 
+                [disabled]="invoice.status != 'Open'">
+
+                <mat-icon>
+                    @if (this.printingInvoices.indexOf(invoice) > 0) {
+                        <mat-spinner diameter="25" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+                    }
+                    @else {
+                        print
+                    }
+                </mat-icon>
+            </button>
+
         </td>
     </ng-container> 
 

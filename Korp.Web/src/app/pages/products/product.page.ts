@@ -8,6 +8,7 @@ import { MatTableModule } from '@angular/material/table'
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { ProductCreateUpdateDialogComponent, ProductCreateUpdateDialogData } from "./components/product-create-update/product-create-update.dialog";
 import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
     selector: 'app-product-page',
@@ -21,6 +22,7 @@ export class ProductPage implements OnInit {
     displayedColumns: string[] = ['id', 'name', 'stock', 'reserved', 'available', 'createdAt', 'actions']
 
     readonly dialog = inject(MatDialog);
+    private _snackBar = inject(MatSnackBar);
 
     constructor(private _productService: ProductService) { }
 
@@ -40,7 +42,10 @@ export class ProductPage implements OnInit {
     deleteProduct(product: Product): void {
         this._productService.delete(product.id)
             .subscribe({ 
-                next: () => this.getProducts()
+                next: () => {
+                    this._snackBar.open("Produto deletado com sucesso")
+                    this.getProducts()
+                }
             })
     }
 

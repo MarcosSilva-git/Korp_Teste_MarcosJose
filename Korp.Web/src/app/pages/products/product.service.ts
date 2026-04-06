@@ -3,7 +3,7 @@ import { BaseService } from "../../core/base.service";
 import { environment } from "../../enviroment";
 import { catchError, Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { CreateOrUpdateProductInput, Product } from "./product.model";
+import { CreateOrUpdateProduct, Product } from "./product.model";
 import { DefaultListResponse } from "../../core/models/default-list-response.model";
 
 @Injectable({
@@ -20,13 +20,13 @@ export class ProductService extends BaseService {
             .pipe(catchError(this.catchProblemDetailsError))
     }
 
-    create(product: CreateOrUpdateProductInput): Observable<Product> {
+    create(product: CreateOrUpdateProduct): Observable<Product> {
         return this.http
             .post<Product>(this.url, product)
             .pipe(catchError(this.catchProblemDetailsError))
     }
 
-    update(product: CreateOrUpdateProductInput): Observable<Product> {
+    update(product: CreateOrUpdateProduct): Observable<Product> {
         return this.http
             .patch<Product>(this.url + '/' + product.id, product)
             .pipe(catchError(this.catchProblemDetailsError))
