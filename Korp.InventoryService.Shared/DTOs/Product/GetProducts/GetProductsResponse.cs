@@ -7,5 +7,5 @@ public class GetProductsResponse
     public int Stock { get; set; }
     public int Reserved { get; set; }
     public int Available { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }

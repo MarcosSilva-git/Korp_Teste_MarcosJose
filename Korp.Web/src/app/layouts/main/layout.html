@@ -1,1 +1,22 @@
-<router-outlet></router-outlet>
+<mat-toolbar color="primary">
+    <h2>Sistema de Impressão de Notas</h2>
+
+    <span class="spacer"></span>
+
+    <nav>
+        <button mat-button>
+            <a routerLink="produtos">
+                Produtos
+            </a>
+        </button>
+        <button mat-button>
+            <a routerLink="notas">
+                Notas
+            </a>
+        </button>
+    </nav>
+</mat-toolbar>
+
+<div class="container">
+    <router-outlet></router-outlet>
+</div>

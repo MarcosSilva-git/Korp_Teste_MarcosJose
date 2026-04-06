@@ -19,24 +19,16 @@ public class UpdateProductHandler(InventoryDbContext _inventoryDbContext)
 
         product.ChangeName(command.Name);
 
-        if (product.Stock == 0)
-        {
+        if (product.Stock == 0 || command.Stock > product.Stock)
             product.UpdateStock(command.Stock);
-        }
-        else if (command.Stock < product.Stock && command.Stock < product.Reserved)
-        {
-            return new ValidationResult(
-                $"The requested quantity exceeds the current available balance for this product. Available: {product.Available}, Requested: {command.Stock}", 
-                [$"ProductId_{command.Id}"]);
-        }
+
+        else if (command.Stock < product.Stock && command.Stock < product.Available)
+            product.UpdateStock(command.Stock);
+
         else
-        {
-            throw new InvalidOperationException(
-                $"Invalid stock transition for ProductId: {command.Id}. " +
-                $"Available: {product.Available}, " +
-                $"Reserved: {product.Reserved}, " +
-                $"Requested: {command.Stock}");
-        }
+            return new ValidationResult(
+                $"The requested quantity exceeds the current available balance for this product. Available: {product.Available}, Requested: {command.Stock}",
+                [$"ProductId_{command.Id}"]);
 
         await _inventoryDbContext.SaveChangesAsync(ct);
 

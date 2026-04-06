@@ -1,12 +1,12 @@
 ﻿using Korp.InvoiceService.Features.Invoice.Domain.Enums;
 using Korp.InvoiceService.Features.Invoice.Domain.Exceptions;
 using Korp.InvoiceService.Infraestructure;
-using Korp.InvoiceService.Shared.DTOs.Invoice.DeleteInvoice;
+using Korp.InvoiceService.Shared.DTOs.Invoice.CloseInvoice;
 using Korp.Shared.Abstractions;
 using Korp.Shared.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
-namespace Korp.InvoiceService.Features.Invoice.DeleteInvoice;
+namespace Korp.InvoiceService.Features.Invoice.CloseInvoice;
 
 public class CloseInvoiceHandler(InvoiceDbContext _invoiceDbContext) 
     : IRequestHandlerAsync<CloseInvoiceRequest, Result<CloseInvoiceResponse, ValidationResult>>

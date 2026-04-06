@@ -5,8 +5,8 @@ import { routes } from './app/app.routes'; // Suas rotas exportadas
 import { provideHttpClient } from '@angular/common/http';
 
 bootstrapApplication(App, {
-  providers: [
-    provideRouter(routes),
-    provideHttpClient() 
-  ]
+    providers: [
+        provideRouter(routes),
+        provideHttpClient() 
+    ]
 }).catch(err => console.error(err));

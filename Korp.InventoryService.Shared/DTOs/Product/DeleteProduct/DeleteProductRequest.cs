@@ -4,4 +4,4 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Korp.InventoryService.Shared.DTOs.Product.DeleteProduct;
 
-public record DeleteProductRequest(int ProductId) : IRequest<Result<int, ValidationResult>>;
+public record DeleteProductRequest(int ProductId) : IRequest<Result<DeleteProductResponse, ValidationResult>>;

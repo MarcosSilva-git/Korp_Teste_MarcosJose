@@ -49,7 +49,8 @@ public class GetInvoicesHandler(
                 items = invoice.InvoiceItems.Select(ii => new GetInvoiceItemResponse
                 {
                     ProductId = ii.ProductId,
-                    Quantity = ii.Quantity
+                    Quantity = ii.Quantity,
+                    CreatedDate = ii.CreatedAt
                 })
             })
             .ToListAsync(cancellationToken);

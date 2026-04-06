@@ -10,7 +10,11 @@ export const routes: Routes = [
             {
                 path: 'produtos',
                 loadChildren: () => import('./pages/products/product.routes').then(m => m.PRODUCT_ROUTES),
-            }
+            },
+            {
+                path: 'notas',
+                loadChildren: () => import('./pages/invoices/invoice.routes').then(m => m.INVOICE_ROUTES),
+            },
         ]
     }
 ];

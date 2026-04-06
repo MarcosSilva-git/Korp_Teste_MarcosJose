@@ -8,8 +8,8 @@ public class InvoiceEntity
     public int Id { get; private set; }
     public InvoiceStatusEnum InvoiceStatus { get; private set; } = InvoiceStatusEnum.Processing;
     public Guid SagaId { get; private set; } = Guid.NewGuid();
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? DeletedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? DeletedAt { get; set; }
 
     public ICollection<InvoiceItemEntity> InvoiceItems { get; private set; } = new List<InvoiceItemEntity>();
 

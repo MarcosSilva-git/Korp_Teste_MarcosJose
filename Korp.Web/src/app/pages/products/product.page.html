@@ -1,3 +1,58 @@
-<div>
-    <h1>products page</h1>
+<div class="create-button">
+    <button mat-flat-button color="primary" (click)="openDialog()">
+        Criar Produto
+    </button>
 </div>
+
+<table mat-table [dataSource]="this.products ?? []">
+    <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let product"> {{ product.id }} </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef class="field"> Nome </th>
+        <td mat-cell *matCellDef="let product" class="field"> {{ product.name }} </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="stock" class="field">
+        <th mat-header-cell *matHeaderCellDef class="field"> Estoque </th>
+        <td mat-cell *matCellDef="let product" class="field"> {{ product.stock }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="reserved" class="field">
+        <th mat-header-cell *matHeaderCellDef class="field"> Reservado </th>
+        <td mat-cell *matCellDef="let product" class="field"> {{ product.reserved }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="available" class="field">
+        <th mat-header-cell *matHeaderCellDef class="field"> Disponível </th>
+        <td mat-cell *matCellDef="let product" class="field"> {{ product.available }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="createdAt" class="field">
+        <th mat-header-cell *matHeaderCellDef class="field"> Criado em </th>
+        <td mat-cell *matCellDef="let product" class="field"> 
+            {{ product.createdAt | date:'dd/MM/yyyy HH:mm' }} 
+        </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions"></th>
+        <td mat-cell *matCellDef="let product" class="actions">
+            <button mat-icon-button color="primary" (click)="openDialog(product)">
+                <mat-icon>edit</mat-icon>
+            </button>
+            <button  mat-icon-button color="warn" (click)="deleteProduct(product)">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </td>
+    </ng-container> 
+
+    <thead>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    </thead>
+    <tbody>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </tbody>
+</table>

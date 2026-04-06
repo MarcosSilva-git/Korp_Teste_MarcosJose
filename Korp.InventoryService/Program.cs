@@ -1,17 +1,22 @@
-using Korp.InventoryService.Features.Product.AddProduct;
-using Korp.InventoryService.Features.Product.ReserveProducts;
-using Korp.InventoryService.Features.Product.DeleteProduct;
 using Korp.InventoryService.Infraestructure;
+using Korp.Shared.Extensions;
 using Korp.Shared.Middlewares;
 using Microsoft.EntityFrameworkCore;
-using Korp.InventoryService.Features.Product.GetProducts;
-using Korp.InventoryService.Features.Product.UpdateProduct;
-using Korp.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularAppPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:49896")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddProblemDetails();
 builder.Services.AddLogging();
@@ -39,6 +44,8 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AngularAppPolicy");
 
 app.UseAuthorization();
 

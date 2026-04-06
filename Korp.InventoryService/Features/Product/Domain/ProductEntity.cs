@@ -8,8 +8,8 @@ public class ProductEntity : EntityBase
     public string Name { get; set; } = null!;
     public int Stock { get; private set; }
     public int Reserved { get; private set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? DeletedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? DeletedAt { get; set; }
 
     public int Available => Stock - Reserved;
 

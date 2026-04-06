@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content>
+    <form [formGroup]="productForm" (ngSubmit)="submit()" class="dialog-content">
+        <mat-form-field appearance="outline">
+            <mat-label>Nome</mat-label>
+            <input matInput formControlName="name" placeholder="Ex. Iphone 15">
+            @if (productForm.get('name')?.invalid) {
+                <mat-error>
+                    {{ getErrorMessage('name') }}
+                </mat-error>
+            }
+        </mat-form-field>
+    
+        <mat-form-field appearance="outline">
+            <mat-label>Estoque</mat-label>
+            <input matInput type="number" formControlName="stock" placeholder="Ex. 123">
+            @if (productForm.get('stock')?.invalid) {
+                <mat-error>
+                    {{ getErrorMessage('stock') }}
+                </mat-error>
+            }
+        </mat-form-field>
+
+        <div class="buttons">
+            <button mat-flat-button mat-dialog-close type="button" (click)="onNoClick()">Cancelar</button>
+            <button mat-raised-button color="primary">
+                Salvar
+            </button>
+        </div>
+    </form>
+
+</mat-dialog-content>

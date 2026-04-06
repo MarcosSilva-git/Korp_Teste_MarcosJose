@@ -12,10 +12,10 @@ import { RouterModule } from '@angular/router';
 // }
 
 @Component({
-  selector: 'app-root',
-  template: '<router-outlet></router-outlet>',
-  imports: [RouterModule],
-  standalone: true,
+    selector: 'app-root',
+    template: '<router-outlet></router-outlet>',
+    imports: [RouterModule],
+    standalone: true,
 })
 export class App {
    

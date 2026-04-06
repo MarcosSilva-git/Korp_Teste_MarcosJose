@@ -36,7 +36,7 @@ public class ProductsController(IDispatcher _dispatcher) : SharedControllerBase
         return CreatedAtAction(nameof(Add), new { newProduct.Id }, newProduct);
     }
 
-    [HttpPost("api/products/reserve")]
+    [HttpPost("reserve")]
     public async Task<IActionResult> ReserveProducts([FromBody] ReserveProductsRequest request, CancellationToken ct)
     {
         var result = await _dispatcher.SendAsync(request, ct);
@@ -47,14 +47,14 @@ public class ProductsController(IDispatcher _dispatcher) : SharedControllerBase
         return NoContent();
     }
 
-    [HttpPost("api/products/reserve/rollback")]
+    [HttpPost("reserve/rollback")]
     public async Task<IActionResult> RollbackReserveProducts(RollbackReserveProductsRequest request, CancellationToken ct)
     {
         await _dispatcher.SendAsync(request, ct);
         return NoContent();
     }
 
-    [HttpPut("api/products/{id}")]
+    [HttpPatch("{id}")]
     public async Task<IActionResult> Update(int id, UpdateProductRequest request, CancellationToken ct)
     {
         var result = await _dispatcher.SendAsync(new UpdateProductCommand(id, request.Name, request.Stock), ct);
@@ -65,7 +65,7 @@ public class ProductsController(IDispatcher _dispatcher) : SharedControllerBase
         return Ok(result.Value);
     }
 
-    [HttpDelete("api/products/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _dispatcher.SendAsync(new DeleteProductRequest(id));

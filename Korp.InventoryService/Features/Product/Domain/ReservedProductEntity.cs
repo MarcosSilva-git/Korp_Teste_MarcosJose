@@ -12,7 +12,7 @@ public class ReservedProductEntity : EntityBase
     public string OriginType { get; private set; }
     public int Quantity { get; private set; }
 
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
     public StockMovementStatusEnum StockMovementStatus { get; private set; } = StockMovementStatusEnum.Reserved;
 
     public ProductEntity? Product { get; private set; }

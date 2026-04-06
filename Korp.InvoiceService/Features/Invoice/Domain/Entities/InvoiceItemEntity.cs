@@ -10,8 +10,8 @@ public class InvoiceItemEntity
     public int ProductId { get; private set; }
     public string ProductName { get; private set; } = null!;
     public int Quantity { get; private set; }
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
-    public DateTime? DeletedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? DeletedAt { get; set; }
 
     protected InvoiceItemEntity() { }
 

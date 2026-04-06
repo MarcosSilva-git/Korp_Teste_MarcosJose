@@ -11,6 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularAppPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:49896")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddProblemDetails();
 
 builder.Services.AddDbContext<InvoiceDbContext>(options =>
@@ -53,6 +63,8 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AngularAppPolicy");
 
 app.UseAuthorization();
 
