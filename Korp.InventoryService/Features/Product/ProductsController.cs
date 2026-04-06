@@ -26,7 +26,7 @@ public class ProductsController(IDispatcher _dispatcher) : SharedControllerBase
         if (result.IsFailure)
             return CreateValidationProblemFromResult(result);
 
-        return Ok(new { Products = result.Value });
+        return Ok(new { Data = result.Value });
     }
 
     [HttpPost]

@@ -6,6 +6,7 @@ using Korp.Shared.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Korp.InventoryService.Features.Product.GetProducts;
 using Korp.InventoryService.Features.Product.UpdateProduct;
+using Korp.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,12 +19,9 @@ builder.Services.AddLogging();
 builder.Services.AddDbContext<InventoryDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<GetProductsHandler>();
-builder.Services.AddScoped<AddProductHandler>();
-builder.Services.AddScoped<UpdateProductHandler>();
-builder.Services.AddScoped<DeleteProductHandler>();
-builder.Services.AddScoped<ReserveProductsHandler>();
-builder.Services.AddScoped<RollbackReserveProductsHandler>();
+builder.Services
+    .AddApplicationHandlers()
+    .AddDispatcher();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 

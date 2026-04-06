@@ -23,7 +23,7 @@ public class InvoicesController(IDispatcher _dispatcher) : Controller
             return ValidationProblem(ModelState);
         }
 
-        return Ok(new { Invoices = result.Value });
+        return Ok(new { Data = result.Value });
     }
 
     [HttpPost]
